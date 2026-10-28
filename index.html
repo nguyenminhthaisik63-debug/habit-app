@@ -370,7 +370,16 @@
   <!-- DANH SÁCH -->
   <div class="dang-xem" id="dang-xem"></div>
   <div id="danh-sach"></div>
-  
+    <!-- ĐỒNG BỘ GOOGLE -->
+  <div class="sao-luu">
+    <div class="nhan">Đồng bộ giữa các thiết bị</div>
+    <div class="hang-nut">
+      <button class="phu" id="dong-bo-dang-nhap" type="button" hidden>Đăng nhập bằng Google</button>
+      <button class="phu" id="dong-bo-dang-xuat" type="button" hidden>Đăng xuất</button>
+    </div>
+    <div class="chuoi" id="dong-bo-tai-khoan"></div>
+    <div class="chuoi" id="dong-bo-trang-thai"></div>
+  </div>
   <!-- SAO LƯU DỮ LIỆU -->
   <div class="sao-luu">
     <div class="nhan">Sao lưu dữ liệu</div>
@@ -422,9 +431,10 @@
     return keHoach.find(k => k.id === idDangChon);
   }
 
-  function luu() {
+   function luu() {
     localStorage.setItem("keHoachV2", JSON.stringify(keHoach));
     localStorage.setItem("keHoachDangChon", String(idDangChon));
+    sauKhiLuu();                       // báo cho phần đồng bộ biết có thay đổi
   }
 
   function doc() {
@@ -924,8 +934,9 @@
   if (!(pomo.soPhien >= 1)) pomo.soPhien = 3;
   if (typeof pomo.dem !== "object" || pomo.dem === null) pomo.dem = {};
 
-  function luuPomo() {
+   function luuPomo() {
     localStorage.setItem(POMO_KEY, JSON.stringify(pomo));
+    sauKhiLuu();                       // báo cho phần đồng bộ biết có thay đổi
   }
 
   // Trạng thái đồng hồ (không lưu)
@@ -1655,6 +1666,230 @@
     khung.querySelector("#thang-tk-truoc").onclick = () => { thangTK = new Date(y, m - 1, 1); veThongKeThang(); };
     khung.querySelector("#thang-tk-sau").onclick = () => { thangTK = new Date(y, m + 1, 1); veThongKeThang(); };
   }
+    // ===== 10H. ĐỒNG BỘ BẰNG TÀI KHOẢN GOOGLE (Firebase) =====
+
+  // DÁN cấu hình Firebase của bạn vào đây (lấy ở bước A2). Thay cả khối { ... } này.
+  const firebaseConfig = {
+  apiKey: "AIzaSyCaB2aWazNU8Wqzi6cxUvVrpAn327nFW2Q",
+  authDomain: "habit-app-0409nmt.firebaseapp.com",
+  projectId: "habit-app-0409nmt",
+  storageBucket: "habit-app-0409nmt.firebasestorage.app",
+  messagingSenderId: "288401488015",
+  appId: "1:288401488015:web:626d814942d677db8458fa"
+};
+
+  const FB_GOC = "https://www.gstatic.com/firebasejs/12.15.0/";
+
+  let fb = null;              // các hàm Firebase (có sau khi tải xong)
+  let fbUser = null;          // người dùng đang đăng nhập
+  let fbDoc = null;           // tài liệu của người dùng trên cloud
+  let fbHuyNghe = null;       // hàm dừng lắng nghe thay đổi
+  let fbHen = null;           // bộ hẹn giờ gửi dữ liệu
+  let fbJsonCuoi = "";        // bản dữ liệu cuối cùng đã gửi hoặc nhận
+  let fbSanSang = false;      // true khi đã cấu hình Firebase
+  let fbDangNhan = false;     // true trong lúc đang áp dụng dữ liệu từ cloud
+
+  // Dữ liệu cần đồng bộ, dạng chuỗi chữ
+  const fbGoi = () => JSON.stringify({ keHoach: keHoach, pomo: pomo });
+
+  function fbTrangThai(chu) {
+    document.getElementById("dong-bo-trang-thai").textContent = chu;
+  }
+
+  // Hiện/ẩn nút đăng nhập, đăng xuất và tên tài khoản
+  function veDongBo() {
+    document.getElementById("dong-bo-dang-nhap").hidden = !!fbUser;
+    document.getElementById("dong-bo-dang-xuat").hidden = !fbUser;
+    document.getElementById("dong-bo-tai-khoan").textContent =
+      fbUser ? "Tài khoản: " + (fbUser.email || fbUser.displayName || "") : "Chưa đăng nhập";
+  }
+
+  // Được gọi mỗi khi dữ liệu được lưu trên máy này
+  function sauKhiLuu() {
+    if (!fbSanSang || fbDangNhan) return;
+    localStorage.setItem("chuaDongBo", "1");      // đánh dấu: có thay đổi chưa gửi lên cloud
+    dayLenCloud();
+  }
+
+  // Gửi dữ liệu lên cloud (gộp các thay đổi liên tiếp trong 1 giây thành một lần gửi)
+  function dayLenCloud() {
+    if (!fb || !fbUser || !fbDoc) return;
+    clearTimeout(fbHen);
+    fbHen = setTimeout(async () => {
+      const json = fbGoi();
+      if (json === fbJsonCuoi) { localStorage.removeItem("chuaDongBo"); return; }
+      try {
+        fbTrangThai("Đang đồng bộ...");
+        await fb.setDoc(fbDoc, { json: json, capNhat: Date.now() });
+        fbJsonCuoi = json;
+        if (fbGoi() === json) localStorage.removeItem("chuaDongBo");
+        fbTrangThai("Đã đồng bộ lúc " + new Date().toLocaleTimeString("ru-RU"));
+      } catch (e) {
+        console.error(e);
+        fbTrangThai("Lỗi đồng bộ, sẽ thử lại ở lần thay đổi sau");
+      }
+    }, 1000);
+  }
+
+  // Áp dụng dữ liệu nhận từ cloud vào app (dữ liệu được kiểm tra bằng lamSachDuLieu)
+  function apDungTuCloud(json) {
+    let du = null;
+    try { du = lamSachDuLieu(JSON.parse(json)); } catch (e) { du = null; }
+    if (!du) return false;
+
+    fbDangNhan = true;                                   // để không gửi ngược lại lên cloud
+    keHoach = du.keHoach;
+    pomo = du.pomo;
+    if (!keHoach.some(k => k.id === idDangChon)) idDangChon = keHoach[0].id;
+    localStorage.setItem("keHoachV2", JSON.stringify(keHoach));
+    localStorage.setItem("keHoachDangChon", String(idDangChon));
+    localStorage.setItem(POMO_KEY, JSON.stringify(pomo));
+    if (!pChay) pConLai = pTong();
+    ve(); vePomoCaiDat(); vePomo(); vePomoGio();
+    fbDangNhan = false;
+    return true;
+  }
+
+  // Lắng nghe thay đổi từ thiết bị khác
+  function fbNghe() {
+    if (fbHuyNghe) fbHuyNghe();
+    fbHuyNghe = fb.onSnapshot(fbDoc, snap => {
+      if (!snap.exists() || snap.metadata.hasPendingWrites || snap.metadata.fromCache) return;
+      const json = snap.data().json;
+      if (typeof json !== "string" || json === fbJsonCuoi) return;
+      if (json === fbGoi()) { fbJsonCuoi = json; return; }                // giống bản trên máy
+      if (localStorage.getItem("chuaDongBo") === "1") return;             // máy này còn thay đổi chưa gửi: giữ bản trên máy
+      if (apDungTuCloud(json)) {
+        fbJsonCuoi = json;
+        fbTrangThai("Đã nhận dữ liệu mới lúc " + new Date().toLocaleTimeString("ru-RU"));
+      }
+    }, err => {
+      console.error(err);
+      fbTrangThai("Mất kết nối đồng bộ");
+    });
+  }
+
+  // Chạy ngay sau khi đăng nhập thành công
+  async function fbBatDauDongBo(user) {
+    fbUser = user;
+    fbDoc = fb.doc(fb.db, "users", user.uid);
+    const daLienKet = localStorage.getItem("dongBoUid") === user.uid;
+    const chuaGui = localStorage.getItem("chuaDongBo") === "1";
+
+    try {
+      const snap = await fb.getDoc(fbDoc);
+
+      if (!snap.exists()) {
+        // Cloud chưa có gì: gửi dữ liệu của máy này lên
+        fbJsonCuoi = fbGoi();
+        await fb.setDoc(fbDoc, { json: fbJsonCuoi, capNhat: Date.now() });
+        localStorage.removeItem("chuaDongBo");
+
+      } else if (!daLienKet) {
+        // Lần đầu nối máy này với tài khoản: bạn chọn bản nào được giữ
+        localStorage.setItem("saoLuuTruocKhiDongBo", fbGoi());            // giữ một bản của máy này phòng khi cần
+        const dungCloud = confirm(
+          "Tài khoản Google này đã có dữ liệu trên đám mây.\n\n" +
+          "OK = dùng dữ liệu trên đám mây (dữ liệu trên máy này sẽ bị THAY THẾ)\n" +
+          "Hủy = dùng dữ liệu trên máy này (dữ liệu trên đám mây sẽ bị GHI ĐÈ)"
+        );
+        if (dungCloud) {
+          if (apDungTuCloud(snap.data().json)) fbJsonCuoi = snap.data().json;
+        } else {
+          if (!confirm("Chắc chắn ghi đè dữ liệu trên đám mây bằng dữ liệu của máy này?")) {
+            await dangXuat();
+            return;
+          }
+          fbJsonCuoi = fbGoi();
+          await fb.setDoc(fbDoc, { json: fbJsonCuoi, capNhat: Date.now() });
+        }
+        localStorage.removeItem("chuaDongBo");
+
+      } else if (chuaGui) {
+        // Máy này có thay đổi chưa kịp gửi: gửi lên
+        fbJsonCuoi = "";
+        dayLenCloud();
+      }
+
+      localStorage.setItem("dongBoUid", user.uid);
+      fbTrangThai("Đã kết nối đồng bộ");
+      fbNghe();
+    } catch (e) {
+      console.error(e);
+      fbTrangThai("Chưa kết nối được. Kiểm tra mạng và cài đặt Firebase (xem F12 → Console).");
+    }
+  }
+
+  // Phải gọi signInWithPopup ngay trong lúc bấm nút, nếu không trình duyệt sẽ chặn cửa sổ đăng nhập
+  async function dangNhapGoogle() {
+    if (!fb) {
+      alert("Chưa tải được dịch vụ đồng bộ. Hãy kiểm tra mạng rồi tải lại trang.");
+      return;
+    }
+    try {
+      await fb.signInWithPopup(fb.auth, new fb.GoogleAuthProvider());
+    } catch (e) {
+      console.error(e);
+      alert("Đăng nhập chưa thành công: " + (e.code || e.message));
+    }
+  }
+
+  async function dangXuat() {
+    if (!fb) return;
+    if (fbHuyNghe) { fbHuyNghe(); fbHuyNghe = null; }
+    localStorage.removeItem("dongBoUid");
+    await fb.signOut(fb.auth);          // dữ liệu trên máy vẫn được giữ nguyên
+  }
+
+  // Tải Firebase và theo dõi trạng thái đăng nhập
+  async function khoiDongDongBo() {
+    document.getElementById("dong-bo-dang-nhap").onclick = dangNhapGoogle;
+    document.getElementById("dong-bo-dang-xuat").onclick = dangXuat;
+
+    if (FIREBASE_CONFIG.apiKey === "DÁN-VÀO-ĐÂY") {
+      document.getElementById("dong-bo-tai-khoan").textContent = "Chưa cấu hình đồng bộ.";
+      return;
+    }
+    fbSanSang = true;
+    document.getElementById("dong-bo-tai-khoan").textContent = "Đang tải dịch vụ đồng bộ...";
+
+    try {
+      const [appM, authM, fsM] = await Promise.all([
+        import(FB_GOC + "firebase-app.js"),
+        import(FB_GOC + "firebase-auth.js"),
+        import(FB_GOC + "firebase-firestore.js")
+      ]);
+      const app = appM.initializeApp(FIREBASE_CONFIG);
+      fb = {
+        auth: authM.getAuth(app),
+        GoogleAuthProvider: authM.GoogleAuthProvider,
+        signInWithPopup: authM.signInWithPopup,
+        signOut: authM.signOut,
+        onAuthStateChanged: authM.onAuthStateChanged,
+        db: fsM.initializeFirestore(app, {
+          localCache: fsM.persistentLocalCache({ tabManager: fsM.persistentMultipleTabManager() })
+        }),
+        doc: fsM.doc, getDoc: fsM.getDoc, setDoc: fsM.setDoc, onSnapshot: fsM.onSnapshot
+      };
+    } catch (e) {
+      console.error(e);
+      document.getElementById("dong-bo-tai-khoan").textContent =
+        "Chưa tải được dịch vụ đồng bộ (có thể đang offline). App vẫn dùng bình thường.";
+      return;
+    }
+
+    fb.onAuthStateChanged(fb.auth, async user => {
+      if (!user) {
+        fbUser = null; fbDoc = null;
+        if (fbHuyNghe) { fbHuyNghe(); fbHuyNghe = null; }
+        fbTrangThai("");
+        veDongBo();
+        return;
+      }
+      await fbBatDauDongBo(user);
+      veDongBo();
+    });
+  }
   // ===== 11. KHỞI ĐỘNG =====
   function capNhatDongHo() {
     const bayGio = new Date();
@@ -1686,6 +1921,7 @@
   doc();
   ve();
   khoiDongPomo();
+    khoiDongDongBo();
 </script>
 </body>
 </html>
