@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мои привычки</title>
+<style>
+  /* ===== 1. GIAO DIỆN (CSS) ===== */
+  :root {
+    --nen: #f3f6f4;
+    --the: #ffffff;
+    --chu: #1d2b27;
+    --chu-nhat: #6b7c76;
+    --xanh: #1f7a5c;
+    --vien: #d5dfda;
+    --do: #b5483a;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0; padding: 32px 16px;
+    background: var(--nen); color: var(--chu);
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+  main { max-width: 680px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  .ngay { color: var(--chu-nhat); margin: 0 0 20px; font-variant-numeric: tabular-nums; }
+  button { font: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--xanh); outline-offset: 2px; }
+
+  /* --- Pomodoro --- */
+  .pomo {
+    background: var(--the); border: 1px solid var(--vien);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
+  }
+  .pomo summary { font-weight: 600; cursor: pointer; }
+  .pomo-che-do { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 6px; }
+  .pomo-gio {
+    font-size: 56px; font-weight: 700; text-align: center;
+    font-variant-numeric: tabular-nums; margin: 4px 0 10px;
+  }
+  .pomo-trang-thai { text-align: center; font-size: 14px; color: var(--chu-nhat); }
+  .pomo-nut { justify-content: center; margin: 12px 0 16px; flex-wrap: wrap; }
+  .pomo-cai-dat { border-top: 1px solid var(--vien); padding-top: 14px; }
+  .pomo-dong { margin-bottom: 12px; }
+  .pomo-dong .nhan { display: block; font-size: 13px; color: var(--chu-nhat); margin-bottom: 6px; }
+  .pomo input[type=number] {
+    width: 76px; padding: 6px 8px; font-size: 15px;
+    border: 1px solid var(--vien); border-radius: 8px; background: var(--the); color: var(--chu);
+  }
+  .pomo-tu-dong { font-size: 14px; color: var(--chu); display: flex; gap: 8px; align-items: center; }
+  /* --- Pomodoro toàn màn hình và thu nhỏ --- */
+  .pomo-toan {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--nen); color: var(--chu);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; gap: 8px;
+  }
+  .pomo-toan-che-do { font-size: 24px; font-weight: 600; color: var(--xanh); }
+  .pomo-toan-gio {
+    font-size: min(26vw, 220px); font-weight: 700; line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .pomo-toan-thanh { width: min(80vw, 600px); }
+  .pomo-mini {
+    position: fixed; right: 16px; bottom: 16px; z-index: 90;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--the); border: 1px solid var(--vien); border-radius: 12px;
+    padding: 10px 12px; box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  }
+  .pomo-mini-gio { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .pomo-mini-che-do { font-size: 12px; color: var(--chu-nhat); }
+  .pomo-mini .phu { padding: 8px 12px; }
+    .pomo select {
+    padding: 6px 8px; font-size: 15px; max-width: 100%;
+    border: 1px solid var(--vien); border-radius: 8px; background: var(--the); color: var(--chu);
+  }
+    /* --- Thống kê tuần --- */
+  .thong-ke {
+    background: var(--the); border: 1px solid var(--vien);
+    border-radius: 10px; padding: 16px; margin-bottom: 24px;
+  }
+  .tk-so { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-bottom: 12px; }
+  .tk-lon { font-size: 28px; font-weight: 700; }
+  .tk-delta { text-align: center; margin-bottom: 12px; }
+  .tk-dong { border-top: 1px solid var(--vien); padding: 12px 0; }
+  .tk-tren { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .tk-hang { display: flex; gap: 4px; }
+  .tk-o {
+    flex: 1; text-align: center; font-size: 11px; padding: 6px 0;
+    border-radius: 6px; background: var(--nen); color: var(--chu-nhat);
+  }
+  .tk-o.co { background: var(--xanh); color: #fff; }
+  .tk-o.bo { background: #f3d9d5; color: var(--do); }
+  .tk-o.nghi { background: transparent; border: 1px dashed var(--vien); }
+  .tk-o.tuonglai { opacity: .6; }
+  .nut-thang:disabled { opacity: .35; cursor: default; }
+    /* --- Sao lưu dữ liệu --- */
+  .sao-luu { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--vien); }
+  .sao-luu .nhan { font-size: 13px; color: var(--chu-nhat); margin-bottom: 8px; }
+  .sao-luu .chuoi { margin-top: 8px; }
+    /* --- Thống kê tháng --- */
+  .thong-ke summary { cursor: pointer; margin-bottom: 12px; }
+  .tk-cot-hang { display: flex; gap: 8px; margin: 4px 0 16px; }
+  .tk-cot { flex: 1; text-align: center; }
+  .tk-cot-so { font-size: 12px; color: var(--chu-nhat); margin-bottom: 4px; }
+  .tk-cot-thanh {
+    height: 70px; background: var(--nen); border-radius: 6px;
+    display: flex; align-items: flex-end; overflow: hidden;
+  }
+  .tk-cot-thanh div { width: 100%; background: var(--xanh); }
+  .tk-thanh { height: 8px; background: var(--vien); border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
+  .tk-thanh div { height: 100%; background: var(--xanh); }
+  /* --- Tab kế hoạch --- */
+  .tab-hang { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    padding: 8px 14px; border-radius: 20px; font-size: 14px;
+    border: 1px solid var(--vien); background: var(--the); color: var(--chu);
+  }
+  .tab.chon { background: var(--xanh); border-color: var(--xanh); color: #fff; font-weight: 600; }
+  .tab.them-kh { border-style: dashed; color: var(--xanh); border-color: var(--xanh); }
+
+  /* --- Form tạo kế hoạch --- */
+  .form-kh {
+    background: var(--the); border: 1px solid var(--vien);
+    border-radius: 10px; padding: 16px; margin-bottom: 16px;
+  }
+  .form-kh label { display: block; font-size: 13px; color: var(--chu-nhat); margin-bottom: 10px; }
+  .form-kh input {
+    display: block; width: 100%; margin-top: 4px; padding: 10px 12px; font-size: 16px;
+    border: 1px solid var(--vien); border-radius: 8px; background: var(--the); color: var(--chu);
+  }
+  .hai-cot { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hang-nut { display: flex; gap: 8px; }
+  .phu {
+    padding: 12px 18px; border-radius: 8px; border: 1px solid var(--vien);
+    background: var(--the); color: var(--chu);
+  }
+
+  /* --- Thẻ thông tin kế hoạch --- */
+  .thong-tin-kh {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    background: var(--the); border: 1px solid var(--vien);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px;
+  }
+  .thong-tin-kh .dong { color: var(--chu-nhat); }
+  .thong-tin-kh strong { color: var(--chu); }
+  .xoa-kh { border: 0; background: none; color: var(--chu-nhat); font-size: 13px; text-decoration: underline; white-space: nowrap; }
+  .xoa-kh:hover { color: var(--do); }
+
+  .tien-do { background: var(--vien); border-radius: 8px; height: 10px; overflow: hidden; margin-bottom: 6px; }
+  .tien-do div { height: 100%; background: var(--xanh); width: 0; transition: width .3s; }
+  .tien-do-chu { font-size: 14px; color: var(--chu-nhat); margin-bottom: 24px; }
+  form { display: flex; gap: 8px; margin-bottom: 10px; }
+  input[type=text] {
+    flex: 1; padding: 12px 14px; font-size: 16px;
+    border: 1px solid var(--vien); border-radius: 8px; background: var(--the);
+  }
+  .them {
+    padding: 12px 18px; border: 0; border-radius: 8px;
+    background: var(--xanh); color: #fff; font-weight: 600;
+  }
+
+  /* --- Chọn ngày trong tuần --- */
+  .chon-thu { margin-bottom: 24px; }
+  .chon-thu .nhan { font-size: 13px; color: var(--chu-nhat); margin-bottom: 6px; }
+  .chip-hang { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .chip {
+    min-width: 40px; padding: 6px 10px; border-radius: 16px; font-size: 13px;
+    border: 1px solid var(--vien); background: var(--the); color: var(--chu-nhat);
+  }
+  .chip.bat { background: var(--xanh); border-color: var(--xanh); color: #fff; font-weight: 600; }
+  .preset {
+    padding: 6px 10px; border-radius: 16px; font-size: 12px;
+    border: 1px dashed var(--xanh); background: var(--the); color: var(--xanh);
+  }
+
+  /* --- Lịch --- */
+  .lich {
+    background: var(--the); border: 1px solid var(--vien);
+    border-radius: 10px; padding: 16px; margin-bottom: 24px;
+  }
+  .lich-dau { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .nut-thang {
+    width: 36px; height: 36px; border-radius: 8px; font-size: 18px;
+    border: 1px solid var(--vien); background: var(--the); color: var(--chu);
+  }
+  .luoi { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .thu { text-align: center; font-size: 12px; color: var(--chu-nhat); padding: 4px 0; }
+  .ngay-o {
+    aspect-ratio: 1; border: 2px solid transparent; border-radius: 8px;
+    background: var(--nen); font-size: 14px; color: var(--chu);
+  }
+  .ngay-o:disabled { opacity: .35; cursor: default; }
+  .ngay-o.ngoai { opacity: .5; }
+  .ngay-o.hom-nay { border-color: var(--xanh); }
+  .ngay-o.chon { outline: 3px solid var(--chu); outline-offset: 1px; }
+  .chu-thich { font-size: 12px; color: var(--chu-nhat); margin-top: 10px; }
+
+  /* --- Danh sách --- */
+  .dang-xem { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 600; }
+  .ve-nay {
+    border: 1px solid var(--xanh); background: var(--the); color: var(--xanh);
+    border-radius: 8px; padding: 6px 12px; font-size: 14px;
+  }
+  .thoi-quen {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    background: var(--the); border: 1px solid var(--vien);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .thoi-quen.nghi-hom .hang-tren { opacity: .5; }
+  .hang-tren { display: flex; align-items: center; gap: 14px; width: 100%; }
+  .tick {
+    width: 34px; height: 34px; border-radius: 50%; flex: none;
+    border: 2px solid var(--xanh); background: var(--the);
+    color: #fff; font-size: 18px; line-height: 1;
+  }
+  .tick.xong { background: var(--xanh); }
+  .tick:disabled { border-color: var(--vien); cursor: default; }
+  .thong-tin { flex: 1; min-width: 0; }
+  .ten { font-weight: 600; overflow-wrap: anywhere; }
+  .chuoi { font-size: 13px; color: var(--chu-nhat); }
+  .tuan { display: flex; gap: 4px; }
+  .o { width: 14px; height: 14px; border-radius: 3px; background: var(--vien); }
+  .o.co { background: var(--xanh); }
+  .o.nghi { background: transparent; border: 1px dashed var(--vien); }
+  .xoa { border: 0; background: none; color: var(--chu-nhat); font-size: 20px; padding: 4px 8px; }
+  .xoa:hover { color: var(--do); }
+  .thoi-quen .chip-hang { width: 100%; padding-left: 48px; }
+  /* --- Thói quen theo thời gian / số lần --- */
+  .muc-tieu { width: 100%; padding-left: 48px; }
+  .muc-tieu-chu { font-size: 13px; color: var(--chu-nhat); margin-bottom: 6px; }
+  .muc-tieu-nut { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sua-mt { border: 0; background: none; color: var(--xanh); text-decoration: underline; font-size: 12px; margin-left: 8px; }
+  .tick.xong:disabled { border-color: var(--xanh); }
+  .chon-thu select, .chon-thu input[type=number] {
+    padding: 6px 8px; font-size: 15px;
+    border: 1px solid var(--vien); border-radius: 8px; background: var(--the); color: var(--chu);
+  }
+  .chon-thu input[type=number] { width: 76px; }
+  .trong { text-align: center; color: var(--chu-nhat); padding: 40px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Мои привычки</h1>
+  <p class="ngay" id="ngay"></p>
+
+  <!-- POMODORO -->
+  <details class="pomo" open>
+    <summary>Đồng hồ Pomodoro</summary>
+
+    <div class="pomo-che-do">
+      <button class="chip bat" id="p-che-focus" type="button">Tập trung</button>
+      <button class="chip" id="p-che-nghi" type="button">Nghỉ ngắn</button>
+      <button class="chip" id="p-che-dai" type="button">Nghỉ dài</button>
+    </div>
+
+    <div class="pomo-gio" id="p-gio">25:00</div>
+    <div class="tien-do"><div id="p-thanh"></div></div>
+    <div class="pomo-trang-thai" id="p-trang-thai"></div>
+    <div class="pomo-trang-thai" id="p-chu-ky"></div>
+    <div class="pomo-trang-thai" id="p-dem"></div>
+
+    <div class="hang-nut pomo-nut">
+      <button class="them" id="p-bat-dau" type="button">Bắt đầu</button>
+      <button class="phu" id="p-dat-lai" type="button">Đặt lại</button>
+      <button class="phu" id="p-bo-qua" type="button">Bỏ qua</button>
+            <button class="phu" id="p-toan-man" type="button">⛶ Toàn màn hình</button>
+      <button class="phu" id="p-thu-nho" type="button">Thu nhỏ</button>
+            <button class="phu" id="p-noi" type="button">Cửa sổ nổi</button>
+    </div>
+
+    <div class="pomo-cai-dat">
+      <div class="pomo-dong">
+        <span class="nhan">Thời gian tập trung (phút)</span>
+        <div class="chip-hang">
+          <span class="chip-hang" id="p-chip-focus"></span>
+          <input type="number" id="p-nhap-focus" min="1" max="180" aria-label="Số phút tập trung">
+        </div>
+      </div>
+      <div class="pomo-dong">
+        <span class="nhan">Thời gian nghỉ ngắn (phút)</span>
+        <div class="chip-hang">
+          <span class="chip-hang" id="p-chip-nghi"></span>
+          <input type="number" id="p-nhap-nghi" min="1" max="180" aria-label="Số phút nghỉ ngắn">
+        </div>
+      </div>
+      <div class="pomo-dong">
+        <span class="nhan">Thời gian nghỉ dài (phút)</span>
+        <div class="chip-hang">
+          <span class="chip-hang" id="p-chip-dai"></span>
+          <input type="number" id="p-nhap-dai" min="1" max="180" aria-label="Số phút nghỉ dài">
+        </div>
+      </div>
+      <div class="pomo-dong">
+        <span class="nhan">Nghỉ dài sau mỗi (phiên tập trung)</span>
+        <div class="chip-hang">
+          <input type="number" id="p-nhap-sophien" min="1" max="10" aria-label="Số phiên trước khi nghỉ dài">
+        </div>
+      </div>
+            <div class="pomo-dong">
+        <span class="nhan">Mỗi phiên tập trung xong, tự cộng phút vào thói quen:</span>
+        <select id="p-noi-thoi-quen"></select>
+        <div class="chuoi" id="p-noi-tien-do"></div>
+      </div>
+      <label class="pomo-tu-dong">
+        <input type="checkbox" id="p-tudong"> Tự động chạy phiên tiếp theo
+      </label>
+    </div>
+  </details>
+
+  <!-- TAB KẾ HOẠCH -->
+  <div class="tab-hang" id="tab-hang"></div>
+
+  <!-- FORM TẠO KẾ HOẠCH -->
+  <div class="form-kh" id="form-kh" hidden>
+    <label>Tên kế hoạch
+      <input type="text" id="kh-ten" maxlength="40" placeholder="Ví dụ: Kế hoạch quý 4">
+    </label>
+    <div class="hai-cot">
+      <label>Bắt đầu <input type="date" id="kh-bat-dau"></label>
+      <label>Kết thúc <input type="date" id="kh-ket-thuc"></label>
+    </div>
+    <div class="hang-nut">
+      <button class="them" id="kh-luu" type="button">Tạo kế hoạch</button>
+      <button class="phu" id="kh-huy" type="button">Hủy</button>
+    </div>
+  </div>
+
+  <!-- THÔNG TIN KẾ HOẠCH -->
+  <div class="thong-tin-kh" id="thong-tin-kh"></div>
+
+  <div class="tien-do"><div id="thanh"></div></div>
+  <div class="tien-do-chu" id="tien-do-chu"></div>
+
+  <form id="form">
+    <input type="text" id="o-nhap" placeholder="Thêm thói quen vào kế hoạch này" maxlength="80" required>
+    <button class="them" type="submit">Thêm</button>
+  </form>
+
+  <!-- CHỌN NGÀY LÀM CHO THÓI QUEN MỚI -->
+  <div class="chon-thu">
+    <div class="nhan">Ngày làm trong tuần:</div>
+    <div class="chip-hang" id="chon-thu"></div>
+  </div>
+    <!-- LOẠI THÓI QUEN MỚI -->
+  <div class="chon-thu">
+    <div class="nhan">Loại thói quen:</div>
+    <div class="chip-hang">
+      <select id="loai-moi">
+        <option value="tick">Đánh dấu xong</option>
+        <option value="thoigian">Theo thời gian (phút)</option>
+        <option value="solan">Theo số lần</option>
+      </select>
+      <span id="muc-tieu-hop" hidden>
+        Mục tiêu mỗi ngày:
+        <input type="number" id="muc-tieu-moi" min="1" max="1000" value="40">
+        <span id="don-vi-moi">phút</span>
+      </span>
+    </div>
+  </div>
+  <!-- LỊCH -->
+  <div class="lich" id="lich"></div>
+  <div class="thong-ke" id="thong-ke"></div>
+    <details class="thong-ke" open>
+    <summary><strong>Thống kê tháng</strong></summary>
+    <div id="thong-ke-thang"></div>
+  </details>
+  <!-- DANH SÁCH -->
+  <div class="dang-xem" id="dang-xem"></div>
+  <div id="danh-sach"></div>
+  
+  <!-- SAO LƯU DỮ LIỆU -->
+  <div class="sao-luu">
+    <div class="nhan">Sao lưu dữ liệu</div>
+    <div class="hang-nut">
+      <button class="phu" id="xuat-du-lieu" type="button">⬇ Xuất ra file</button>
+      <button class="phu" id="nhap-du-lieu" type="button">⬆ Nhập từ file</button>
+      <input type="file" id="chon-file" accept=".json,application/json" hidden>
+    </div>
+    <div class="chuoi">Nên xuất định kỳ (ví dụ mỗi tuần) và cất file ở nơi an toàn như USB hoặc Google Drive.</div>
+  </div>
+</main>
+
+<!-- POMODORO TOÀN MÀN HÌNH -->
+<div class="pomo-toan" id="pomo-toan" hidden>
+  <div class="pomo-toan-che-do" id="pt-che-do"></div>
+  <div class="pomo-toan-gio" id="pt-gio">25:00</div>
+  <div class="tien-do pomo-toan-thanh"><div id="pt-thanh"></div></div>
+  <div class="pomo-trang-thai" id="pt-chu-ky"></div>
+  <div class="hang-nut pomo-nut">
+    <button class="them" id="pt-bat-dau" type="button">Bắt đầu</button>
+    <button class="phu" id="pt-bo-qua" type="button">Bỏ qua</button>
+    <button class="phu" id="pt-thoat" type="button">Thoát</button>
+  </div>
+</div>
+
+<!-- POMODORO THU NHỎ Ở GÓC -->
+<div class="pomo-mini" id="pomo-mini" hidden>
+  <div>
+    <div class="pomo-mini-gio" id="pm-gio">25:00</div>
+    <div class="pomo-mini-che-do" id="pm-che-do"></div>
+  </div>
+  <button class="phu" id="pm-bat-dau" type="button">▶</button>
+    <button class="phu" id="pm-noi" type="button" title="Cửa sổ nổi trên mọi tab">Nổi</button>
+  <button class="phu" id="pm-mo-rong" type="button" aria-label="Phóng to">⤢</button>
+</div>
+<script>
+  // ===== 2. DỮ LIỆU =====
+  // keHoach = [ { id, ten, batDau, ketThuc,
+  //               thoiQuen: [ { id, ten, ngay: [...], thu: [0..6] } ] } ]
+  // thu: các ngày trong tuần phải làm. 0 = Thứ 2, 1 = Thứ 3, ... 6 = Chủ nhật
+  let keHoach = [];
+  let idDangChon = null;
+
+  const CHU_THU = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+  const TAT_CA = [0, 1, 2, 3, 4, 5, 6];
+  let thuMoi = TAT_CA.slice();   // ngày được chọn cho thói quen sắp thêm
+
+  function kh() {
+    return keHoach.find(k => k.id === idDangChon);
+  }
+
+  function luu() {
+    localStorage.setItem("keHoachV2", JSON.stringify(keHoach));
+    localStorage.setItem("keHoachDangChon", String(idDangChon));
+  }
+
+  function doc() {
+    let data = null;
+    try { data = JSON.parse(localStorage.getItem("keHoachV2")); } catch (e) {}
+
+    if (!Array.isArray(data) || data.length === 0) {
+      let cu = [];
+      try { cu = JSON.parse(localStorage.getItem("thoiQuen")) || []; } catch (e) {}
+      data = [{ id: Date.now(), ten: "Chung", batDau: "", ketThuc: "", thoiQuen: cu }];
+    }
+
+    // CHUYỂN ĐỔI: thói quen cũ chưa có "thu" thì mặc định làm mọi ngày
+        data.forEach(k => k.thoiQuen.forEach(t => {
+      if (!Array.isArray(t.thu) || t.thu.length === 0) t.thu = TAT_CA.slice();
+      if (!t.loai) t.loai = "tick";                 // thói quen cũ: loại đánh dấu
+      if (!(t.mucTieu >= 1)) t.mucTieu = 1;
+      if (!t.tienDo) t.tienDo = {};                 // tiến độ từng ngày: { "2026-10-26": 25 }
+    }));
+
+    keHoach = data;
+    const luuId = Number(localStorage.getItem("keHoachDangChon"));
+    idDangChon = keHoach.some(k => k.id === luuId) ? luuId : keHoach[0].id;
+    luu();
+  }
+
+  // ===== 3. HÀM HỖ TRỢ VỀ NGÀY =====
+  function chuoiNgay(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const t = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${t}`;
+  }
+  function lui(soNgay) {
+    const d = new Date();
+    d.setDate(d.getDate() - soNgay);
+    return chuoiNgay(d);
+  }
+  const homNay = () => lui(0);
+
+  function ghepNgay(y, m, d) {
+    return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  }
+  function chenhLech(a, b) {
+    return Math.round((new Date(b + "T00:00:00") - new Date(a + "T00:00:00")) / 86400000);
+  }
+  function congNgay(s, n) {
+    const d = new Date(s + "T00:00:00");
+    d.setDate(d.getDate() + n);
+    return chuoiNgay(d);
+  }
+  function dinhDang(s) {
+    const [y, m, d] = s.split("-");
+    return `${d}.${m}.${y}`;
+  }
+
+  // Ngày s rơi vào thứ mấy? 0 = Thứ 2 ... 6 = Chủ nhật
+  function chiSoThu(s) {
+    return (new Date(s + "T00:00:00").getDay() + 6) % 7;
+  }
+  // Thói quen tq có lịch vào ngày s không?
+  function coLich(tq, s) {
+    return tq.thu.includes(chiSoThu(s));
+  }
+
+  // Chuỗi liên tiếp: chỉ xét các ngày CÓ LỊCH, ngày nghỉ được bỏ qua
+  function tinhChuoi(tq) {
+    let dem = 0;
+    for (let i = 0; i < 400; i++) {
+      const s = lui(i);
+      if (!coLich(tq, s)) continue;
+      if (tq.ngay.includes(s)) dem++;
+      else if (i === 0) continue;
+      else break;
+    }
+    return dem;
+  }
+
+  // % hoàn thành của kế hoạch: chỉ đếm các ngày có lịch
+  function tinhPhanTram(k) {
+    if (!k.batDau || !k.ketThuc || homNay() < k.batDau) return null;
+    const den = homNay() < k.ketThuc ? homNay() : k.ketThuc;
+    const soNgay = chenhLech(k.batDau, den) + 1;
+    let canLam = 0, xong = 0;
+    for (let i = 0; i < soNgay; i++) {
+      const s = congNgay(k.batDau, i);
+      k.thoiQuen.forEach(t => {
+        if (coLich(t, s)) {
+          canLam++;
+          if (t.ngay.includes(s)) xong++;
+        }
+      });
+    }
+    return canLam === 0 ? 0 : Math.round(xong / canLam * 100);
+  }
+
+  // ===== 4. TRẠNG THÁI LỊCH =====
+  let ngayChon = homNay();
+  let thangXem = new Date();
+  thangXem.setDate(1);
+
+  const TEN_THANG = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+
+  // ===== 5. HÀNH ĐỘNG =====
+    function them(ten) {
+    const loai = document.getElementById("loai-moi").value;
+    let muc = Math.round(Number(document.getElementById("muc-tieu-moi").value));
+    if (!(muc >= 1)) muc = loai === "thoigian" ? 40 : 2;
+    muc = Math.min(muc, 1000);
+    kh().thoiQuen.push({
+      id: Date.now(), ten: ten.trim(), ngay: [], thu: thuMoi.slice(),
+      loai: loai, mucTieu: loai === "tick" ? 1 : muc, tienDo: {}
+    });
+    luu(); ve();
+  }
+  function bamTick(id) {
+    const tq = kh().thoiQuen.find(x => x.id === id);
+    if (tq.ngay.includes(ngayChon)) tq.ngay = tq.ngay.filter(n => n !== ngayChon);
+    else tq.ngay.push(ngayChon);
+    luu(); ve();
+  }
+  function xoa(id) {
+    const tq = kh().thoiQuen.find(x => x.id === id);
+    if (confirm(`Xóa thói quen "${tq.ten}"?`)) {
+      kh().thoiQuen = kh().thoiQuen.filter(x => x.id !== id);
+      luu(); ve();
+    }
+  }
+  function doiThu(id, idx) {
+    const tq = kh().thoiQuen.find(x => x.id === id);
+    if (tq.thu.includes(idx)) {
+      if (tq.thu.length === 1) { alert("Thói quen cần ít nhất 1 ngày trong tuần."); return; }
+      tq.thu = tq.thu.filter(n => n !== idx);
+    } else {
+      tq.thu.push(idx);
+      tq.thu.sort();
+    }
+    luu(); ve();
+  }
+    // Cộng/trừ tiến độ (phút hoặc số lần) của ngày đang chọn
+  function doiTienDo(id, soLuong) {
+    const tq = kh().thoiQuen.find(x => x.id === id);
+    if (!tq.tienDo) tq.tienDo = {};
+    tq.tienDo[ngayChon] = Math.max(0, (tq.tienDo[ngayChon] || 0) + soLuong);
+    dongBoNgay(tq, ngayChon);
+    luu(); ve();
+  }
+
+  // Đạt mục tiêu thì tính là đã làm xong ngày đó, tụt xuống dưới mục tiêu thì bỏ tính
+  function dongBoNgay(tq, ngay) {
+    const du = (tq.tienDo[ngay] || 0) >= tq.mucTieu;
+    const co = tq.ngay.includes(ngay);
+    if (du && !co) tq.ngay.push(ngay);
+    if (!du && co) tq.ngay = tq.ngay.filter(n => n !== ngay);
+  }
+
+  // Đổi mục tiêu mỗi ngày của thói quen có sẵn
+  function doiMucTieu(id) {
+    const tq = kh().thoiQuen.find(x => x.id === id);
+    const donVi = tq.loai === "thoigian" ? "phút" : "lần";
+    const v = Math.round(Number(prompt(`Mục tiêu mỗi ngày (${donVi}):`, tq.mucTieu)));
+    if (!(v >= 1)) return;
+    tq.mucTieu = Math.min(v, 1000);
+    Object.keys(tq.tienDo || {}).forEach(n => dongBoNgay(tq, n));   // tính lại các ngày cũ
+    luu(); ve();
+  }
+  function chonKeHoach(id) {
+    idDangChon = id;
+    ngayChon = homNay();
+    thangXem = new Date(); thangXem.setDate(1);
+    luu(); ve();
+  }
+  function xoaKeHoach() {
+    if (keHoach.length === 1) {
+      alert("Cần giữ lại ít nhất 1 kế hoạch.");
+      return;
+    }
+    const k = kh();
+    if (confirm(`Xóa kế hoạch "${k.ten}" và ${k.thoiQuen.length} thói quen bên trong?`)) {
+      keHoach = keHoach.filter(x => x.id !== k.id);
+      idDangChon = keHoach[0].id;
+      luu(); ve();
+    }
+  }
+
+  // --- Form tạo kế hoạch ---
+  function moForm() {
+    const t = new Date();
+    const dau = new Date(t.getFullYear(), t.getMonth(), 1);
+    const cuoi = new Date(t.getFullYear(), t.getMonth() + 3, 0);
+    document.getElementById("kh-ten").value = "";
+    document.getElementById("kh-bat-dau").value = chuoiNgay(dau);
+    document.getElementById("kh-ket-thuc").value = chuoiNgay(cuoi);
+    document.getElementById("form-kh").hidden = false;
+    document.getElementById("kh-ten").focus();
+  }
+  function dongForm() {
+    document.getElementById("form-kh").hidden = true;
+  }
+  function taoKeHoach() {
+    const ten = document.getElementById("kh-ten").value.trim();
+    const bd = document.getElementById("kh-bat-dau").value;
+    const kt = document.getElementById("kh-ket-thuc").value;
+    if (!ten) { alert("Hãy nhập tên kế hoạch."); return; }
+    if (bd && kt && kt < bd) { alert("Ngày kết thúc phải sau ngày bắt đầu."); return; }
+
+    const moi = { id: Date.now(), ten: ten, batDau: bd, ketThuc: kt, thoiQuen: [] };
+    keHoach.push(moi);
+    dongForm();
+    chonKeHoach(moi.id);
+  }
+
+  // ===== 6. VẼ TAB + THÔNG TIN KẾ HOẠCH =====
+  function veTab() {
+    const hang = document.getElementById("tab-hang");
+    hang.innerHTML = "";
+    keHoach.forEach(k => {
+      const nut = document.createElement("button");
+      nut.className = "tab" + (k.id === idDangChon ? " chon" : "");
+      nut.textContent = k.ten;
+      nut.onclick = () => chonKeHoach(k.id);
+      hang.appendChild(nut);
+    });
+    const nutThem = document.createElement("button");
+    nutThem.className = "tab them-kh";
+    nutThem.textContent = "+ Kế hoạch";
+    nutThem.onclick = moForm;
+    hang.appendChild(nutThem);
+  }
+
+  function veThongTin() {
+    const k = kh();
+    let dong1 = "Không giới hạn thời gian";
+    let dong2 = "";
+
+    if (k.batDau && k.ketThuc) {
+      dong1 = `${dinhDang(k.batDau)} – ${dinhDang(k.ketThuc)}`;
+      const tong = chenhLech(k.batDau, k.ketThuc) + 1;
+      const h = homNay();
+      if (h < k.batDau) {
+        dong2 = `Bắt đầu sau ${chenhLech(h, k.batDau)} ngày`;
+      } else if (h > k.ketThuc) {
+        dong2 = "Kế hoạch đã kết thúc";
+      } else {
+        const d = chenhLech(k.batDau, h) + 1;
+        dong2 = `Ngày ${d}/${tong} · còn ${tong - d} ngày`;
+      }
+      const pt = tinhPhanTram(k);
+      if (pt !== null) dong2 += ` · Hoàn thành ${pt}%`;
+    }
+
+    document.getElementById("thong-tin-kh").innerHTML = `
+      <div>
+        <div><strong>${dong1}</strong></div>
+        <div class="dong">${dong2}</div>
+      </div>
+      <button class="xoa-kh" id="xoa-kh">Xóa kế hoạch</button>`;
+    document.getElementById("xoa-kh").onclick = xoaKeHoach;
+  }
+
+  // ===== 7. VẼ NÚT CHỌN NGÀY CHO THÓI QUEN MỚI =====
+  function veChonThu() {
+    const hang = document.getElementById("chon-thu");
+    hang.innerHTML = "";
+
+    CHU_THU.forEach((ten, idx) => {
+      const nut = document.createElement("button");
+      nut.type = "button";
+      nut.className = "chip" + (thuMoi.includes(idx) ? " bat" : "");
+      nut.textContent = ten;
+      nut.onclick = () => {
+        if (thuMoi.includes(idx)) {
+          if (thuMoi.length === 1) return;
+          thuMoi = thuMoi.filter(n => n !== idx);
+        } else {
+          thuMoi.push(idx);
+          thuMoi.sort();
+        }
+        veChonThu();
+      };
+      hang.appendChild(nut);
+    });
+
+    [["Mỗi ngày", [0,1,2,3,4,5,6]],
+     ["T2–T6", [0,1,2,3,4]],
+     ["T2·T4·T6", [0,2,4]]].forEach(([nhan, thu]) => {
+      const nut = document.createElement("button");
+      nut.type = "button";
+      nut.className = "preset";
+      nut.textContent = nhan;
+      nut.onclick = () => { thuMoi = thu.slice(); veChonThu(); };
+      hang.appendChild(nut);
+    });
+  }
+
+  // ===== 8. VẼ LỊCH =====
+  function veLich() {
+    const k = kh();
+    const y = thangXem.getFullYear();
+    const m = thangXem.getMonth();
+    const soNgay = new Date(y, m + 1, 0).getDate();
+    const lech = (new Date(y, m, 1).getDay() + 6) % 7;
+    const h = homNay();
+    const coHan = k.batDau && k.ketThuc;
+
+    let html = `
+      <div class="lich-dau">
+        <button class="nut-thang" id="thang-truoc" aria-label="Tháng trước">‹</button>
+        <strong>${TEN_THANG[m]} ${y}</strong>
+        <button class="nut-thang" id="thang-sau" aria-label="Tháng sau">›</button>
+      </div>
+      <div class="luoi">`;
+
+    CHU_THU.forEach(t => { html += `<div class="thu">${t}</div>`; });
+    for (let i = 0; i < lech; i++) html += "<div></div>";
+
+    for (let d = 1; d <= soNgay; d++) {
+      const s = ghepNgay(y, m, d);
+      const tuongLai = s > h;
+      const ngoaiHan = coHan && (s < k.batDau || s > k.ketThuc);
+
+      const coLichHomDo = k.thoiQuen.filter(t => coLich(t, s));
+      const xong = coLichHomDo.filter(t => t.ngay.includes(s)).length;
+      const ty = coLichHomDo.length ? xong / coLichHomDo.length : 0;
+
+      const kieu = ty > 0
+        ? `background: rgba(31,122,92,${0.2 + 0.8 * ty}); color: ${ty > 0.5 ? "#fff" : "inherit"};`
+        : "";
+      const lop = "ngay-o" + (s === h ? " hom-nay" : "") + (s === ngayChon ? " chon" : "") + (ngoaiHan ? " ngoai" : "");
+      html += `<button class="${lop}" style="${kieu}" data-ngay="${s}" ${tuongLai ? "disabled" : ""}
+                 title="${xong}/${coLichHomDo.length}">${d}</button>`;
+    }
+    html += `</div><div class="chu-thich">Màu càng đậm là hôm đó làm càng nhiều (chỉ tính thói quen có lịch hôm đó). Ngày mờ là ngoài thời hạn kế hoạch.</div>`;
+
+    const lich = document.getElementById("lich");
+    lich.innerHTML = html;
+
+    lich.querySelectorAll(".ngay-o").forEach(nut => {
+      nut.onclick = () => { ngayChon = nut.dataset.ngay; ve(); };
+    });
+    document.getElementById("thang-truoc").onclick = () => {
+      thangXem.setMonth(thangXem.getMonth() - 1); veLich();
+    };
+    document.getElementById("thang-sau").onclick = () => {
+      thangXem.setMonth(thangXem.getMonth() + 1); veLich();
+    };
+  }
+
+  // ===== 9. VẼ GIAO DIỆN CHÍNH =====
+  function ve() {
+    const k = kh();
+    const laHomNay = ngayChon === homNay();
+
+    veTab();
+    veThongTin();
+    veChonThu();
+
+    const tenNgay = new Date(ngayChon + "T00:00:00").toLocaleDateString("ru-RU",
+      { weekday: "long", day: "numeric", month: "numeric", year: "numeric" });
+    const dx = document.getElementById("dang-xem");
+    dx.innerHTML = `<span>${laHomNay ? "Сегодня" : tenNgay}</span>` +
+      (laHomNay ? "" : `<button class="ve-nay" id="ve-nay">Về hôm nay</button>`);
+    if (!laHomNay) {
+      document.getElementById("ve-nay").onclick = () => {
+        ngayChon = homNay();
+        thangXem = new Date(); thangXem.setDate(1);
+        ve();
+      };
+    }
+
+    const ds = document.getElementById("danh-sach");
+    ds.innerHTML = "";
+    if (k.thoiQuen.length === 0) {
+      ds.innerHTML = '<div class="trong">Kế hoạch này chưa có thói quen nào. Hãy thêm ở ô phía trên.</div>';
+    }
+
+    const coLichTruoc = k.thoiQuen.filter(t => coLich(t, ngayChon))
+      .concat(k.thoiQuen.filter(t => !coLich(t, ngayChon)));
+
+    coLichTruoc.forEach(tq => {
+      const lamHomNay = coLich(tq, ngayChon);
+      const xong = lamHomNay && tq.ngay.includes(ngayChon);
+      const chuoi = tinhChuoi(tq);
+
+      let o = "";
+      for (let i = 6; i >= 0; i--) {
+        const s = lui(i);
+        const lop = !coLich(tq, s) ? "nghi" : (tq.ngay.includes(s) ? "co" : "");
+        o += `<div class="o ${lop}" title="${s}"></div>`;
+      }
+
+      let dongPhu;
+      if (!lamHomNay) dongPhu = "Nghỉ ngày này";
+      else if (chuoi > 0) dongPhu = "🔥 " + chuoi + " lần liên tiếp";
+      else dongPhu = "Bắt đầu chuỗi mới";
+      dongPhu += ` · ${tq.thu.length} lần/tuần`;
+
+      const div = document.createElement("div");
+      div.className = "thoi-quen" + (lamHomNay ? "" : " nghi-hom");
+      div.innerHTML = `
+        <div class="hang-tren">
+                    <button class="tick ${xong ? "xong" : ""}" ${lamHomNay && tq.loai === "tick" ? "" : "disabled"} aria-label="Đánh dấu">${xong ? "✓" : ""}</button>
+          <div class="thong-tin">
+            <div class="ten"></div>
+            <div class="chuoi">${dongPhu}</div>
+          </div>
+          <div class="tuan">${o}</div>
+          <button class="xoa" aria-label="Xóa">×</button>
+        </div>
+        <div class="chip-hang"></div>`;
+      div.querySelector(".ten").textContent = tq.ten;
+      div.querySelector(".tick").onclick = () => bamTick(tq.id);
+      div.querySelector(".xoa").onclick = () => xoa(tq.id);
+
+      // --- Thói quen theo thời gian / số lần: hiện tiến độ và nút cộng ---
+      if (tq.loai !== "tick" && lamHomNay) {
+        const donVi = tq.loai === "thoigian" ? "phút" : "lần";
+        const da = (tq.tienDo && tq.tienDo[ngayChon]) || 0;
+        const phanTram = Math.min(100, Math.round(da / tq.mucTieu * 100));
+
+        const box = document.createElement("div");
+        box.className = "muc-tieu";
+        box.innerHTML = `
+          <div class="muc-tieu-chu">${da}/${tq.mucTieu} ${donVi}
+            <button class="sua-mt" type="button">Sửa mục tiêu</button></div>
+          <div class="tien-do"><div style="width:${phanTram}%"></div></div>
+          <div class="muc-tieu-nut"></div>`;
+
+        const nuts = box.querySelector(".muc-tieu-nut");
+        const taoNut = (chu, hanhDong) => {
+          const n = document.createElement("button");
+          n.type = "button";
+          n.className = "chip";
+          n.textContent = chu;
+          n.onclick = hanhDong;
+          nuts.appendChild(n);
+        };
+
+        if (tq.loai === "solan") {
+          taoNut("−1", () => doiTienDo(tq.id, -1));
+          taoNut("+1", () => doiTienDo(tq.id, 1));
+        } else {
+          taoNut("+10", () => doiTienDo(tq.id, 10));
+          taoNut("+25", () => doiTienDo(tq.id, 25));
+          taoNut("Số phút khác", () => {
+            const v = Math.round(Number(prompt("Thêm bao nhiêu phút? (gõ số âm để trừ bớt)", "15")));
+            if (v) doiTienDo(tq.id, v);
+          });
+        }
+        box.querySelector(".sua-mt").onclick = () => doiMucTieu(tq.id);
+        div.querySelector(".hang-tren").after(box);
+      }
+      const chips = div.querySelector(".chip-hang");
+      CHU_THU.forEach((ten, idx) => {
+        const nut = document.createElement("button");
+        nut.className = "chip" + (tq.thu.includes(idx) ? " bat" : "");
+        nut.textContent = ten;
+        nut.onclick = () => doiThu(tq.id, idx);
+        chips.appendChild(nut);
+      });
+
+      ds.appendChild(div);
+    });
+
+    const homNayLam = k.thoiQuen.filter(t => coLich(t, ngayChon));
+    const tong = homNayLam.length;
+    const hoanThanh = homNayLam.filter(t => t.ngay.includes(ngayChon)).length;
+    document.getElementById("thanh").style.width = tong ? (hoanThanh / tong * 100) + "%" : "0";
+
+    let chuTienDo = "";
+    if (k.thoiQuen.length > 0) {
+      chuTienDo = tong
+        ? `${laHomNay ? "Сегодня" : "Выбранный день"}: ${hoanThanh} из ${tong}`
+        : "Нет привычек на этот день";
+    }
+    document.getElementById("tien-do-chu").textContent = chuTienDo;
+        vePomoNoi();
+            veThongKe();
+
+    veLich();
+  }
+
+  // ===== 10. POMODORO =====
+  const POMO_KEY = "pomodoroV1";
+
+  // Cài đặt được lưu (đơn vị phút):
+  //   focus = tập trung, nghi = nghỉ ngắn, dai = nghỉ dài
+  //   soPhien = sau bao nhiêu phiên tập trung thì nghỉ dài
+  let pomo = { focus: 25, nghi: 5, dai: 15, soPhien: 3, tuDong: false, dem: {} };
+  try {
+    const daLuu = JSON.parse(localStorage.getItem(POMO_KEY));
+    if (daLuu) pomo = Object.assign(pomo, daLuu);
+  } catch (e) {}
+  if (!(pomo.focus >= 1)) pomo.focus = 25;
+  if (!(pomo.nghi >= 1)) pomo.nghi = 5;
+  if (!(pomo.dai >= 1)) pomo.dai = 15;
+  if (!(pomo.soPhien >= 1)) pomo.soPhien = 3;
+  if (typeof pomo.dem !== "object" || pomo.dem === null) pomo.dem = {};
+
+  function luuPomo() {
+    localStorage.setItem(POMO_KEY, JSON.stringify(pomo));
+  }
+
+  // Trạng thái đồng hồ (không lưu)
+  let pCheDo = "focus";                 // "focus", "nghi" hoặc "dai" (trùng tên khóa trong pomo)
+  let pChay = false;                    // đang chạy hay không
+  let pKetThuc = 0;                     // thời điểm kết thúc (mili giây) khi đang chạy
+  let pConLai = pomo.focus * 60000;     // thời gian còn lại (mili giây)
+  let pChuKy = 0;                       // số phiên tập trung đã xong trong chu kỳ hiện tại
+  let pAudio = null;
+
+  const TEN_CHE_DO = { focus: "Tập trung", nghi: "Nghỉ ngắn", dai: "Nghỉ dài" };
+  const pTong = () => pomo[pCheDo] * 60000;
+
+  function pDinhDang(ms) {
+    const giay = Math.max(0, Math.ceil(ms / 1000));
+    const p = String(Math.floor(giay / 60)).padStart(2, "0");
+    const g = String(giay % 60).padStart(2, "0");
+    return `${p}:${g}`;
+  }
+
+  // Tiếng bíp 3 lần, tạo bằng code nên không cần mạng
+  function beep() {
+    try {
+      pAudio = pAudio || new (window.AudioContext || window.webkitAudioContext)();
+      const ac = pAudio;
+      [0, 0.35, 0.7].forEach(t => {
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.2, ac.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 0.25);
+        o.start(ac.currentTime + t);
+        o.stop(ac.currentTime + t + 0.25);
+      });
+    } catch (e) {}
+  }
+
+  // Cập nhật phần hiển thị thay đổi theo từng giây
+  function vePomoGio() {
+    const gio = pDinhDang(pConLai);
+    document.getElementById("p-gio").textContent = gio;
+    const tyLe = 1 - pConLai / pTong();
+    document.getElementById("p-thanh").style.width = Math.min(100, Math.max(0, tyLe * 100)) + "%";
+    document.title = pChay ? `${gio} · ${TEN_CHE_DO[pCheDo]}` : "Мои привычки";
+        veManHinhPhu();
+  }
+
+  // Vẽ các nút, trạng thái, bộ đếm
+  function vePomo() {
+    ["focus", "nghi", "dai"].forEach(loai => {
+      document.getElementById("p-che-" + loai).className = "chip" + (pCheDo === loai ? " bat" : "");
+    });
+    document.getElementById("p-bat-dau").textContent = pChay ? "Tạm dừng" : "Bắt đầu";
+
+    let tt;
+    if (pChay) tt = pCheDo === "focus" ? "Đang tập trung..." : (pCheDo === "dai" ? "Đang nghỉ dài..." : "Đang nghỉ ngắn...");
+    else if (pConLai < pTong()) tt = "Đã tạm dừng";
+    else tt = "Sẵn sàng";
+    document.getElementById("p-trang-thai").textContent = tt;
+
+    // Dòng chu kỳ: đã xong bao nhiêu phiên, còn mấy phiên nữa thì nghỉ dài
+    let dongChuKy;
+    if (pCheDo === "dai") dongChuKy = "Hoàn thành chu kỳ, thư giãn nào!";
+    else dongChuKy = `Chu kỳ: ${pChuKy}/${pomo.soPhien} phiên · nghỉ dài ${pomo.dai} phút sau phiên thứ ${pomo.soPhien}`;
+    document.getElementById("p-chu-ky").textContent = dongChuKy;
+
+    const soPhien = pomo.dem[homNay()] || 0;
+    document.getElementById("p-dem").textContent = `Hôm nay: ${soPhien} phiên tập trung hoàn thành`;
+  }
+
+  // Vẽ các nút nhanh và ô nhập số phút
+  function vePomoCaiDat() {
+    const nhanh = { focus: [15, 20, 25, 50], nghi: [5, 10, 15], dai: [10, 15, 20, 30] };
+    ["focus", "nghi", "dai"].forEach(loai => {
+      const hang = document.getElementById("p-chip-" + loai);
+      hang.innerHTML = "";
+      nhanh[loai].forEach(phut => {
+        const nut = document.createElement("button");
+        nut.type = "button";
+        nut.className = "chip" + (pomo[loai] === phut ? " bat" : "");
+        nut.textContent = phut;
+        nut.onclick = () => datThoiGian(loai, phut);
+        hang.appendChild(nut);
+      });
+      document.getElementById("p-nhap-" + loai).value = pomo[loai];
+    });
+    document.getElementById("p-nhap-sophien").value = pomo.soPhien;
+    document.getElementById("p-tudong").checked = pomo.tuDong;
+  }
+
+  // Đổi thời gian tập trung, nghỉ ngắn hoặc nghỉ dài
+  function datThoiGian(loai, phut) {
+    pomo[loai] = phut;
+    luuPomo();
+    if (pCheDo === loai && !pChay) pConLai = pTong();   // đang dừng thì cập nhật luôn
+    vePomoCaiDat(); vePomo(); vePomoGio();
+  }
+
+  function batDauTamDung() {
+    if (pChay) {
+      pConLai = pKetThuc - Date.now();
+      pChay = false;
+    } else {
+      // Trình duyệt chỉ cho phát âm thanh sau khi người dùng bấm nút
+      try {
+        pAudio = pAudio || new (window.AudioContext || window.webkitAudioContext)();
+        if (pAudio.state === "suspended") pAudio.resume();
+      } catch (e) {}
+      if (pConLai <= 0) pConLai = pTong();
+      pKetThuc = Date.now() + pConLai;
+      pChay = true;
+    }
+    vePomo(); vePomoGio();
+  }
+
+  function datLai() {
+    pChay = false;
+    pConLai = pTong();
+    vePomo(); vePomoGio();
+  }
+
+  function chuyenCheDo(kieu) {
+    if (kieu === pCheDo) return;
+    if (pChay && !confirm("Đồng hồ đang chạy. Chuyển chế độ sẽ đặt lại thời gian. Tiếp tục?")) return;
+    if (pCheDo === "dai") pChuKy = 0;      // rời khỏi nghỉ dài nghĩa là chu kỳ mới
+    pCheDo = kieu;
+    pChay = false;
+    pConLai = pTong();
+    vePomo(); vePomoGio();
+  }
+
+  // Hết giờ một phiên: quyết định phiên tiếp theo
+  //   Tập trung -> (đủ số phiên ? Nghỉ dài : Nghỉ ngắn)
+  //   Nghỉ ngắn -> Tập trung
+  //   Nghỉ dài  -> Tập trung (chu kỳ mới, đếm lại từ 0)
+  function hoanThanhPhien() {
+    beep();
+    if (pCheDo === "focus") {
+      pomo.dem[homNay()] = (pomo.dem[homNay()] || 0) + 1;
+      luuPomo();
+            congPhutChoThoiQuen(pomo.focus);     
+             // cộng số phút của phiên vừa xong vào thói quen đã nối
+                   veThongKe();
+      pChuKy++;
+      pCheDo = pChuKy >= pomo.soPhien ? "dai" : "nghi";
+    } else {
+      if (pCheDo === "dai") pChuKy = 0;
+      pCheDo = "focus";
+    }
+    pConLai = pTong();
+    if (pomo.tuDong) {
+      pKetThuc = Date.now() + pConLai;
+      pChay = true;
+    } else {
+      pChay = false;
+    }
+    vePomo(); vePomoGio();
+  }
+
+  // Dùng mốc thời gian kết thúc nên không bị lệch kể cả khi tab chạy nền
+  function khoiDongPomo() {
+    document.getElementById("p-bat-dau").onclick = batDauTamDung;
+    document.getElementById("p-dat-lai").onclick = datLai;
+    // Bỏ qua: tập trung -> nghỉ ngắn (không tính phiên); nghỉ -> tập trung
+    document.getElementById("p-bo-qua").onclick = () => chuyenCheDo(pCheDo === "focus" ? "nghi" : "focus");
+    document.getElementById("p-che-focus").onclick = () => chuyenCheDo("focus");
+    document.getElementById("p-che-nghi").onclick = () => chuyenCheDo("nghi");
+    document.getElementById("p-che-dai").onclick = () => chuyenCheDo("dai");
+
+    ["focus", "nghi", "dai"].forEach(loai => {
+      const o = document.getElementById("p-nhap-" + loai);
+      o.onchange = () => {
+        let v = Math.round(Number(o.value));
+        if (!(v >= 1)) v = pomo[loai];     // nhập sai thì giữ giá trị cũ
+        v = Math.min(v, 180);
+        datThoiGian(loai, v);
+      };
+    });
+
+    // Số phiên tập trung trước khi nghỉ dài (1 đến 10)
+    const oSoPhien = document.getElementById("p-nhap-sophien");
+    oSoPhien.onchange = () => {
+      let v = Math.round(Number(oSoPhien.value));
+      if (!(v >= 1)) v = pomo.soPhien;
+      v = Math.min(v, 10);
+      pomo.soPhien = v;
+      luuPomo();
+      vePomoCaiDat(); vePomo();
+    };
+
+    document.getElementById("p-tudong").onchange = e => {
+      pomo.tuDong = e.target.checked;
+      luuPomo();
+    };
+
+    setInterval(() => {
+      if (!pChay) return;
+      pConLai = pKetThuc - Date.now();
+      if (pConLai <= 0) hoanThanhPhien();
+      else vePomoGio();
+    }, 250);
+
+    vePomoCaiDat(); vePomo(); vePomoGio();
+  }
+  // ===== 10B. POMODORO: TOÀN MÀN HÌNH VÀ THU NHỎ =====
+  let pToanManHinh = false;   // đang hiện toàn màn hình?
+  let pThuNho = false;        // đang thu nhỏ ở góc?
+
+  // Cập nhật chữ ở chế độ toàn màn hình và khung nhỏ (được gọi mỗi khi đồng hồ đổi)
+  function veManHinhPhu() {
+    const gio = pDinhDang(pConLai);
+    const che = TEN_CHE_DO[pCheDo];
+
+    // Toàn màn hình
+    document.getElementById("pt-gio").textContent = gio;
+    document.getElementById("pt-che-do").textContent = che;
+    document.getElementById("pt-bat-dau").textContent = pChay ? "Tạm dừng" : "Bắt đầu";
+    document.getElementById("pt-thanh").style.width =
+      Math.min(100, Math.max(0, (1 - pConLai / pTong()) * 100)) + "%";
+    document.getElementById("pt-chu-ky").textContent = `Chu kỳ: ${pChuKy}/${pomo.soPhien} phiên`;
+
+    // Khung nhỏ ở góc
+        pmMini.querySelector("#pm-gio").textContent = gio;
+    pmMini.querySelector("#pm-che-do").textContent = che;
+    pmMini.querySelector("#pm-bat-dau").textContent = pChay ? "⏸" : "▶";
+  }
+
+  function moToanManHinh() {
+    pToanManHinh = true;
+    document.getElementById("pomo-toan").hidden = false;
+    veManHinhPhu();
+    // Thử bật toàn màn hình thật của trình duyệt (không được thì vẫn dùng lớp phủ)
+    try {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+    } catch (e) {}
+  }
+
+  function dongToanManHinh() {
+    pToanManHinh = false;
+    document.getElementById("pomo-toan").hidden = true;
+    try {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    } catch (e) {}
+  }
+
+    function thuNho() {
+    pThuNho = true;
+    document.querySelector(".pomo").hidden = true;    // ẩn khung Pomodoro lớn
+    pmMini.hidden = false;                            // hiện khung nhỏ
+    veManHinhPhu();
+  }
+
+   function phongTo() {
+    pThuNho = false;
+    if (pipWin) pipWin.close();                       // đang ở cửa sổ nổi thì đóng nó lại
+    document.querySelector(".pomo").hidden = false;
+    pmMini.hidden = true;
+  }
+
+  document.getElementById("p-toan-man").onclick = moToanManHinh;
+  document.getElementById("p-thu-nho").onclick = thuNho;
+  document.getElementById("pt-thoat").onclick = dongToanManHinh;
+  document.getElementById("pt-bat-dau").onclick = batDauTamDung;
+  document.getElementById("pt-bo-qua").onclick = () => chuyenCheDo(pCheDo === "focus" ? "nghi" : "focus");
+  document.getElementById("pm-bat-dau").onclick = batDauTamDung;
+  document.getElementById("pm-mo-rong").onclick = phongTo;
+
+  // Bấm Esc để thoát toàn màn hình (cả khi thoát bằng phím của trình duyệt)
+  document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement && pToanManHinh) dongToanManHinh();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && pToanManHinh) dongToanManHinh();
+  });
+    // ===== 10C. POMODORO: CỬA SỔ NỔI (hiện trên mọi tab) =====
+  const pmMini = document.getElementById("pomo-mini");   // khung nhỏ, giữ tham chiếu vì nó sẽ đổi chỗ
+  let pipWin = null;                                     // cửa sổ nổi (null = chưa mở)
+
+  // Cùng logic với vòng lặp chính; chạy thêm trong cửa sổ nổi để không bị trình duyệt làm chậm
+  function pNhip() {
+    if (!pChay) return;
+    pConLai = pKetThuc - Date.now();
+    if (pConLai <= 0) hoanThanhPhien();
+    else vePomoGio();
+  }
+
+  async function chuyenCuaSoNoi() {
+    if (pipWin) { pipWin.close(); return; }              // đang mở thì đóng lại
+
+    if (!("documentPictureInPicture" in window)) {
+      alert("Trình duyệt này chưa hỗ trợ cửa sổ nổi. Hãy dùng Chrome hoặc Edge bản mới.");
+      return;
+    }
+    try {
+      pipWin = await documentPictureInPicture.requestWindow({ width: 300, height: 110 });
+    } catch (e) {
+      pipWin = null;
+      return;
+    }
+
+    // Chép giao diện (CSS) sang cửa sổ nổi
+    document.querySelectorAll("style").forEach(s => pipWin.document.head.appendChild(s.cloneNode(true)));
+    pipWin.document.body.style.cssText = "margin:0; padding:0;";
+
+    // Chuyển khung nhỏ sang cửa sổ nổi
+    pmMini.hidden = false;
+    pipWin.document.body.append(pmMini);
+    pipWin.setInterval(pNhip, 250);
+    veManHinhPhu();
+
+    // Khi đóng cửa sổ nổi thì đưa khung nhỏ về góc trang
+    pipWin.addEventListener("pagehide", () => {
+      document.body.append(pmMini);
+      pipWin = null;
+    });
+  }
+
+  document.getElementById("p-noi").onclick = chuyenCuaSoNoi;
+  document.getElementById("pm-noi").onclick = chuyenCuaSoNoi;
+    // ===== 10D. POMODORO NỐI VỚI THÓI QUEN THEO THỜI GIAN =====
+
+  // Tìm thói quen đang được nối (tìm trong mọi kế hoạch). Không có thì trả về null
+  function timThoiQuenNoi() {
+    for (const k of keHoach) {
+      const t = k.thoiQuen.find(x => String(x.id) === String(pomo.noi) && x.loai === "thoigian");
+      if (t) return t;
+    }
+    return null;
+  }
+
+  // Vẽ lại danh sách thói quen theo thời gian trong ô chọn
+  function vePomoNoi() {
+    const o = document.getElementById("p-noi-thoi-quen");
+    o.innerHTML = '<option value="">Không nối</option>';
+    keHoach.forEach(k => k.thoiQuen.forEach(t => {
+      if (t.loai !== "thoigian") return;
+      const opt = document.createElement("option");
+      opt.value = String(t.id);
+      opt.textContent = `${t.ten} (${k.ten})`;       // textContent để an toàn
+      o.appendChild(opt);
+    }));
+
+    // Chọn lại thói quen đã nối; nếu nó đã bị xóa thì bỏ nối
+    const dangNoi = String(pomo.noi || "");
+    o.value = dangNoi;
+    if (o.value !== dangNoi) { pomo.noi = ""; luuPomo(); o.value = ""; }
+
+    const tq = timThoiQuenNoi();
+    document.getElementById("p-noi-tien-do").textContent = tq
+      ? `Hôm nay: ${(tq.tienDo && tq.tienDo[homNay()]) || 0}/${tq.mucTieu} phút`
+      : "";
+  }
+
+  // Cộng phút vào thói quen đã nối, tính cho NGÀY HÔM NAY
+  function congPhutChoThoiQuen(phut) {
+    const tq = timThoiQuenNoi();
+    if (!tq) return;                                  // chưa nối thì không làm gì
+    if (!tq.tienDo) tq.tienDo = {};
+    const h = homNay();
+    tq.tienDo[h] = (tq.tienDo[h] || 0) + phut;
+    dongBoNgay(tq, h);                                // đủ mục tiêu thì tính là xong ngày
+    luu();
+    ve();
+  }
+
+  document.getElementById("p-noi-thoi-quen").onchange = e => {
+    pomo.noi = e.target.value;
+    luuPomo();
+    vePomoNoi();
+  };
+    // ===== 10E. THỐNG KÊ THEO TUẦN =====
+  let tuanDau = null;   // ngày Thứ 2 của tuần đang xem (null = tuần này)
+
+  // Ngày Thứ 2 của tuần chứa ngày s
+  const thuHai = s => congNgay(s, -chiSoThu(s));
+
+  // Tính số liệu của kế hoạch k trong tuần bắt đầu từ ngày "dau" (một ngày Thứ 2)
+  function thongKeTuan(k, dau) {
+    const h = homNay();
+    const khungKH = k.batDau && k.ketThuc;
+    let canLam = 0, xong = 0, hoanHao = 0;
+
+    const dsTQ = k.thoiQuen.map(tq => {
+      const ngayTao = chuoiNgay(new Date(tq.id));        // id của thói quen chính là thời điểm tạo
+      let coLichTuan = 0, xongTuan = 0, tong = 0;
+      const o = [];                                      // trạng thái 7 ngày: co / bo / nghi / tuonglai
+
+      for (let i = 0; i < 7; i++) {
+        const s = congNgay(dau, i);
+        const lam = tq.ngay.includes(s);
+        const trongKH = !khungKH || (s >= k.batDau && s <= k.ketThuc);
+        // Ngày được tính khi: nằm trong kế hoạch, có lịch, và thói quen đã tồn tại (hoặc đã đánh dấu bù)
+        const lich = trongKH && coLich(tq, s) && (s >= ngayTao || lam);
+
+        if (lich) {
+          coLichTuan++;
+          if (lam) xongTuan++;
+          if (s <= h) { canLam++; if (lam) xong++; }     // chỉ tính đến hôm nay
+        }
+        tong += (tq.tienDo && tq.tienDo[s]) || 0;
+        o.push(!lich ? "nghi" : (s > h ? "tuonglai" : (lam ? "co" : "bo")));
+      }
+      return { tq, coLichTuan, xongTuan, tong, o };
+    });
+
+    // Ngày làm đủ: có ít nhất 1 thói quen cần làm và làm đủ tất cả
+    for (let i = 0; i < 7; i++) {
+      const trangThai = dsTQ.map(d => d.o[i]).filter(t => t === "co" || t === "bo");
+      if (trangThai.length > 0 && trangThai.every(t => t === "co")) hoanHao++;
+    }
+
+    return { dsTQ, canLam, xong, hoanHao, phanTram: canLam ? Math.round(xong / canLam * 100) : null };
+  }
+
+  function veThongKe() {
+    const k = kh();
+    if (!tuanDau) tuanDau = thuHai(homNay());
+    const cuoi = congNgay(tuanDau, 6);
+    const laTuanNay = tuanDau === thuHai(homNay());
+
+    const tk = thongKeTuan(k, tuanDau);
+    const tkTruoc = thongKeTuan(k, congNgay(tuanDau, -7));
+
+    // Số phiên Pomodoro trong tuần (tính chung cho cả app)
+    let phien = 0;
+    for (let i = 0; i < 7; i++) phien += pomo.dem[congNgay(tuanDau, i)] || 0;
+
+    let delta = "";
+    if (tk.phanTram !== null && tkTruoc.phanTram !== null) {
+      const d = tk.phanTram - tkTruoc.phanTram;
+      delta = `<div class="chuoi tk-delta">${d > 0 ? "+" : ""}${d}% so với tuần trước</div>`;
+    }
+
+    const khung = document.getElementById("thong-ke");
+    khung.innerHTML = `
+      <div class="lich-dau">
+        <button class="nut-thang" id="tuan-truoc" aria-label="Tuần trước">‹</button>
+        <strong>Tuần ${dinhDang(tuanDau).slice(0, 5)} – ${dinhDang(cuoi)}${laTuanNay ? " (tuần này)" : ""}</strong>
+        <button class="nut-thang" id="tuan-sau" aria-label="Tuần sau" ${laTuanNay ? "disabled" : ""}>›</button>
+      </div>
+      <div class="tk-so">
+        <div><div class="tk-lon">${tk.phanTram === null ? "–" : tk.phanTram + "%"}</div><div class="chuoi">Hoàn thành</div></div>
+        <div><div class="tk-lon">${tk.hoanHao}</div><div class="chuoi">Ngày làm đủ</div></div>
+        <div><div class="tk-lon">${phien}</div><div class="chuoi">Phiên Pomodoro</div></div>
+      </div>
+      ${delta}`;
+
+    // Danh sách từng thói quen
+    const ds = document.createElement("div");
+    if (tk.dsTQ.length === 0) {
+      ds.innerHTML = '<div class="chuoi">Kế hoạch này chưa có thói quen nào.</div>';
+    }
+    tk.dsTQ.forEach(d => {
+      let chu = `${d.xongTuan}/${d.coLichTuan} ngày`;
+      if (d.tq.loai === "thoigian") chu += ` · ${d.tong}/${d.tq.mucTieu * d.coLichTuan} phút`;
+      if (d.tq.loai === "solan") chu += ` · ${d.tong}/${d.tq.mucTieu * d.coLichTuan} lần`;
+
+      let oHtml = "";
+      d.o.forEach((trangThai, i) => {
+        oHtml += `<span class="tk-o ${trangThai}" title="${congNgay(tuanDau, i)}">${CHU_THU[i]}</span>`;
+      });
+
+      const dong = document.createElement("div");
+      dong.className = "tk-dong";
+      dong.innerHTML = `
+        <div class="tk-tren"><span class="ten"></span><span class="chuoi">${chu}</span></div>
+        <div class="tk-hang">${oHtml}</div>`;
+      dong.querySelector(".ten").textContent = d.tq.ten;   // textContent để an toàn
+      ds.appendChild(dong);
+    });
+    khung.appendChild(ds);
+
+    khung.querySelector("#tuan-truoc").onclick = () => { tuanDau = congNgay(tuanDau, -7); veThongKe(); };
+    khung.querySelector("#tuan-sau").onclick = () => { tuanDau = congNgay(tuanDau, 7); veThongKe(); };
+        veThongKeThang();
+  }
+    // ===== 10F. XUẤT / NHẬP DỮ LIỆU =====
+
+  // Chuỗi có đúng dạng ngày "YYYY-MM-DD" không?
+  const laNgay = s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
+
+  // XUẤT: gói toàn bộ dữ liệu thành một file .json và tải về
+  function xuatDuLieu() {
+    const goi = {
+      app: "theo-doi-thoi-quen",
+      phienBan: 1,
+      xuatLuc: new Date().toISOString(),
+      keHoach: keHoach,
+      keHoachDangChon: idDangChon,
+      pomo: pomo
+    };
+    const blob = new Blob([JSON.stringify(goi, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `thoi-quen-${homNay()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // Kiểm tra và làm sạch dữ liệu đọc từ file: giữ đúng kiểu, bỏ phần lạ.
+  // Trả về null nếu file không phải của app này.
+  function lamSachDuLieu(d) {
+    if (!d || !Array.isArray(d.keHoach) || d.keHoach.length === 0) return null;
+
+    const keHoachMoi = d.keHoach.map((k, i) => ({
+      id: Number(k.id) || Date.now() + i,
+      ten: String(k.ten || "Kế hoạch").slice(0, 40),
+      batDau: laNgay(k.batDau) ? k.batDau : "",
+      ketThuc: laNgay(k.ketThuc) ? k.ketThuc : "",
+      thoiQuen: (Array.isArray(k.thoiQuen) ? k.thoiQuen : []).map((t, j) => {
+        const loai = ["tick", "thoigian", "solan"].includes(t.loai) ? t.loai : "tick";
+
+        const tienDo = {};
+        if (t.tienDo && typeof t.tienDo === "object") {
+          Object.keys(t.tienDo).forEach(n => {
+            if (laNgay(n) && Number(t.tienDo[n]) >= 0) tienDo[n] = Number(t.tienDo[n]);
+          });
+        }
+        const thu = (Array.isArray(t.thu) ? t.thu : TAT_CA)
+          .filter(x => Number.isInteger(x) && x >= 0 && x <= 6);
+
+        return {
+          id: Number(t.id) || Date.now() + 1000 + j,
+          ten: String(t.ten || "Thói quen").slice(0, 80),
+          ngay: (Array.isArray(t.ngay) ? t.ngay : []).filter(laNgay),
+          thu: thu.length ? thu : TAT_CA.slice(),
+          loai: loai,
+          mucTieu: loai === "tick" ? 1 : Math.min(1000, Math.max(1, Math.round(Number(t.mucTieu)) || 1)),
+          tienDo: tienDo
+        };
+      })
+    }));
+
+    const p = d.pomo || {};
+    const phutHopLe = (v, macDinh, toiDa) => Math.min(toiDa, Math.max(1, Math.round(Number(v)) || macDinh));
+    const pomoMoi = {
+      focus: phutHopLe(p.focus, 25, 180),
+      nghi: phutHopLe(p.nghi, 5, 180),
+      dai: phutHopLe(p.dai, 15, 180),
+      soPhien: phutHopLe(p.soPhien, 3, 10),
+      tuDong: !!p.tuDong,
+      noi: p.noi && /^\d+$/.test(String(p.noi)) ? String(p.noi) : "",
+      dem: {}
+    };
+    if (p.dem && typeof p.dem === "object") {
+      Object.keys(p.dem).forEach(n => {
+        if (laNgay(n) && Number(p.dem[n]) >= 0) pomoMoi.dem[n] = Math.round(Number(p.dem[n]));
+      });
+    }
+
+    return { keHoach: keHoachMoi, dangChon: Number(d.keHoachDangChon), pomo: pomoMoi };
+  }
+
+  // NHẬP: đọc file, hỏi xác nhận, ghi đè dữ liệu rồi tải lại trang
+  function nhapDuLieu(file) {
+    if (!file) return;
+    const docFile = new FileReader();
+    docFile.onload = () => {
+      let du = null;
+      try { du = lamSachDuLieu(JSON.parse(docFile.result)); } catch (e) { du = null; }
+      if (!du) {
+        alert("File không hợp lệ. Hãy chọn file .json đã xuất từ app này.");
+        return;
+      }
+
+      const soTQ = du.keHoach.reduce((n, k) => n + k.thoiQuen.length, 0);
+      const ok = confirm(
+        `Nhập ${du.keHoach.length} kế hoạch và ${soTQ} thói quen từ file?\n\n` +
+        `Dữ liệu hiện tại trên trình duyệt này sẽ bị THAY THẾ.`
+      );
+      if (!ok) return;
+
+      // Giữ lại một bản của dữ liệu hiện tại phòng khi nhập nhầm
+      localStorage.setItem("saoLuuTruocKhiNhap", JSON.stringify({ keHoach: keHoach, pomo: pomo }));
+
+      localStorage.setItem("keHoachV2", JSON.stringify(du.keHoach));
+      localStorage.setItem("keHoachDangChon", String(du.dangChon));
+      localStorage.setItem(POMO_KEY, JSON.stringify(du.pomo));
+      location.reload();
+    };
+    docFile.readAsText(file);
+  }
+
+  document.getElementById("xuat-du-lieu").onclick = xuatDuLieu;
+  document.getElementById("nhap-du-lieu").onclick = () => document.getElementById("chon-file").click();
+  document.getElementById("chon-file").onchange = e => {
+    nhapDuLieu(e.target.files[0]);
+    e.target.value = "";          // cho phép chọn lại đúng file đó lần sau
+  };
+    // ===== 10G. THỐNG KÊ THEO THÁNG =====
+  let thangTK = null;   // ngày mùng 1 của tháng đang xem (null = tháng này)
+
+  // 125 -> "2 giờ 5 phút", 40 -> "40 phút"
+  function dinhDangPhut(p) {
+    return p >= 60 ? `${Math.floor(p / 60)} giờ ${p % 60} phút` : `${p} phút`;
+  }
+
+  // Trạng thái của thói quen tq trong ngày s:
+  //   "co" = đã làm, "bo" = bỏ lỡ, "nghi" = không tính, "tuonglai" = chưa tới
+  function trangThaiNgay(k, tq, s) {
+    const lam = tq.ngay.includes(s);
+    const trongKH = !(k.batDau && k.ketThuc) || (s >= k.batDau && s <= k.ketThuc);
+    const lich = trongKH && coLich(tq, s) && (s >= chuoiNgay(new Date(tq.id)) || lam);
+    if (!lich) return "nghi";
+    if (s > homNay()) return "tuonglai";
+    return lam ? "co" : "bo";
+  }
+
+  // Tính số liệu của kế hoạch k trong tháng m (0 đến 11) của năm y
+  function thongKeThang(k, y, m) {
+    const soNgay = new Date(y, m + 1, 0).getDate();
+    const lech = (new Date(y, m, 1).getDay() + 6) % 7;        // ngày 1 rơi vào thứ mấy (0 = Thứ 2)
+    const soTuan = Math.ceil((lech + soNgay) / 7);
+    const tuan = Array.from({ length: soTuan }, () => ({ can: 0, xong: 0 }));
+    let canLam = 0, xong = 0, hoanHao = 0;
+
+    const dsTQ = k.thoiQuen.map(tq => ({ tq, canLam: 0, xong: 0, tong: 0, chuoi: 0, chuoiDai: 0 }));
+
+    for (let d = 1; d <= soNgay; d++) {
+      const s = ghepNgay(y, m, d);
+      const w = Math.floor((lech + d - 1) / 7);               // ngày này thuộc tuần thứ mấy của tháng
+      let canNgay = 0, xongNgay = 0;
+
+      dsTQ.forEach(x => {
+        const tt = trangThaiNgay(k, x.tq, s);
+        x.tong += (x.tq.tienDo && x.tq.tienDo[s]) || 0;
+        if (tt === "co" || tt === "bo") {
+          x.canLam++; canNgay++;
+          if (tt === "co") {
+            x.xong++; xongNgay++;
+            x.chuoi++;
+            x.chuoiDai = Math.max(x.chuoiDai, x.chuoi);
+          } else {
+            x.chuoi = 0;                                      // ngày có lịch mà bỏ: chuỗi đứt
+          }
+        }
+      });
+
+      canLam += canNgay; xong += xongNgay;
+      tuan[w].can += canNgay; tuan[w].xong += xongNgay;
+      if (canNgay > 0 && xongNgay === canNgay) hoanHao++;
+    }
+
+    return { dsTQ, tuan, canLam, xong, hoanHao, phanTram: canLam ? Math.round(xong / canLam * 100) : null };
+  }
+
+  function veThongKeThang() {
+    const k = kh();
+    const bay = new Date();
+    if (!thangTK) thangTK = new Date(bay.getFullYear(), bay.getMonth(), 1);
+    const y = thangTK.getFullYear();
+    const m = thangTK.getMonth();
+    const laThangNay = (y === bay.getFullYear() && m === bay.getMonth());
+    const thangTruoc = new Date(y, m - 1, 1);
+
+    const tk = thongKeThang(k, y, m);
+    const tkTruoc = thongKeThang(k, thangTruoc.getFullYear(), thangTruoc.getMonth());
+
+    // Số phiên Pomodoro trong tháng (tính chung cho cả app)
+    let phien = 0;
+    const soNgay = new Date(y, m + 1, 0).getDate();
+    for (let d = 1; d <= soNgay; d++) phien += pomo.dem[ghepNgay(y, m, d)] || 0;
+
+    let delta = "";
+    if (tk.phanTram !== null && tkTruoc.phanTram !== null) {
+      const chenh = tk.phanTram - tkTruoc.phanTram;
+      delta = `<div class="chuoi tk-delta">${chenh > 0 ? "+" : ""}${chenh}% so với tháng trước</div>`;
+    }
+
+    // Biểu đồ cột: % hoàn thành của từng tuần trong tháng
+    let cot = "";
+    tk.tuan.forEach((t, i) => {
+      const pt = t.can ? Math.round(t.xong / t.can * 100) : 0;
+      cot += `
+        <div class="tk-cot">
+          <div class="tk-cot-so">${t.can ? pt + "%" : "–"}</div>
+          <div class="tk-cot-thanh"><div style="height:${pt}%"></div></div>
+          <div class="chuoi">Tuần ${i + 1}</div>
+        </div>`;
+    });
+
+    const khung = document.getElementById("thong-ke-thang");
+    khung.innerHTML = `
+      <div class="lich-dau">
+        <button class="nut-thang" id="thang-tk-truoc" aria-label="Tháng trước">‹</button>
+        <strong>${TEN_THANG[m]} ${y}${laThangNay ? " (tháng này)" : ""}</strong>
+        <button class="nut-thang" id="thang-tk-sau" aria-label="Tháng sau" ${laThangNay ? "disabled" : ""}>›</button>
+      </div>
+      <div class="tk-so">
+        <div><div class="tk-lon">${tk.phanTram === null ? "–" : tk.phanTram + "%"}</div><div class="chuoi">Hoàn thành</div></div>
+        <div><div class="tk-lon">${tk.hoanHao}</div><div class="chuoi">Ngày làm đủ</div></div>
+        <div><div class="tk-lon">${phien}</div><div class="chuoi">Phiên Pomodoro</div></div>
+      </div>
+      ${delta}
+      ${tk.canLam ? `<div class="chuoi">Hoàn thành theo tuần (Tuần 1 là tuần có ngày mùng 1)</div><div class="tk-cot-hang">${cot}</div>` : ""}`;
+
+    // Danh sách từng thói quen
+    const ds = document.createElement("div");
+    if (tk.dsTQ.length === 0) {
+      ds.innerHTML = '<div class="chuoi">Kế hoạch này chưa có thói quen nào.</div>';
+    } else if (!tk.canLam) {
+      ds.innerHTML = '<div class="chuoi">Tháng này chưa có ngày nào cần làm trong kế hoạch.</div>';
+    } else {
+      tk.dsTQ.forEach(x => {
+        const pt = x.canLam ? Math.round(x.xong / x.canLam * 100) : 0;
+        const chiTiet = [];
+        if (x.tq.loai === "thoigian") chiTiet.push(`Tổng ${dinhDangPhut(x.tong)}`);
+        if (x.tq.loai === "solan") chiTiet.push(`Tổng ${x.tong} lần`);
+        if (x.chuoiDai > 0) chiTiet.push(`Chuỗi dài nhất ${x.chuoiDai} lần`);
+
+        const dong = document.createElement("div");
+        dong.className = "tk-dong";
+        dong.innerHTML = `
+          <div class="tk-tren"><span class="ten"></span><span class="chuoi">${x.xong}/${x.canLam} ngày · ${pt}%</span></div>
+          <div class="tk-thanh"><div style="width:${pt}%"></div></div>
+          ${chiTiet.length ? `<div class="chuoi">${chiTiet.join(" · ")}</div>` : ""}`;
+        dong.querySelector(".ten").textContent = x.tq.ten;     // textContent để an toàn
+        ds.appendChild(dong);
+      });
+    }
+    khung.appendChild(ds);
+
+    khung.querySelector("#thang-tk-truoc").onclick = () => { thangTK = new Date(y, m - 1, 1); veThongKeThang(); };
+    khung.querySelector("#thang-tk-sau").onclick = () => { thangTK = new Date(y, m + 1, 1); veThongKeThang(); };
+  }
+  // ===== 11. KHỞI ĐỘNG =====
+  function capNhatDongHo() {
+    const bayGio = new Date();
+    let ngay = bayGio.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    ngay = ngay.charAt(0).toUpperCase() + ngay.slice(1);
+    const gio = bayGio.toLocaleTimeString("ru-RU");
+    document.getElementById("ngay").textContent = ngay + " · " + gio;
+  }
+  capNhatDongHo();
+  setInterval(capNhatDongHo, 1000);
+
+  document.getElementById("form").addEventListener("submit", e => {
+    e.preventDefault();
+    const o = document.getElementById("o-nhap");
+    if (o.value.trim()) { them(o.value); o.value = ""; }
+  });
+  document.getElementById("kh-luu").onclick = taoKeHoach;
+  document.getElementById("kh-huy").onclick = dongForm;
+  
+  // Đổi loại thói quen mới: ẩn/hiện ô mục tiêu và đổi đơn vị
+  function capNhatLoaiMoi() {
+    const loai = document.getElementById("loai-moi").value;
+    document.getElementById("muc-tieu-hop").hidden = (loai === "tick");
+    document.getElementById("don-vi-moi").textContent = loai === "thoigian" ? "phút" : "lần";
+    document.getElementById("muc-tieu-moi").value = loai === "thoigian" ? 40 : 2;   // số gợi ý
+  }
+  document.getElementById("loai-moi").onchange = capNhatLoaiMoi;
+
+  doc();
+  ve();
+  khoiDongPomo();
+</script>
+</body>
+</html>
