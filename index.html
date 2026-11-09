@@ -18,22 +18,33 @@
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   body {
-    margin: 0; padding: 32px 16px;
+    margin: 0; padding: 16px 12px;
     background: var(--nen); color: var(--chu);
     font-family: "Segoe UI", system-ui, sans-serif;
   }
   main { max-width: 680px; margin: 0 auto; }
-  h1 { font-size: 28px; margin: 0 0 4px; }
-  .ngay { color: var(--chu-nhat); margin: 0 0 20px; font-variant-numeric: tabular-nums; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .ngay { color: var(--chu-nhat); margin: 0 0 12px; font-variant-numeric: tabular-nums; }
   button { font: inherit; cursor: pointer; }
   :focus-visible { outline: 3px solid var(--xanh); outline-offset: 2px; }
+
+  /* --- Khối gập chung --- */
+  .khoi {
+    background: var(--the); border: 1px solid var(--vien);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 10px;
+  }
+  .khoi > summary { font-weight: 600; cursor: pointer; }
+  .khoi[open] > summary { margin-bottom: 12px; }
+  .khoi .lich, .khoi .thong-ke { border: 0; padding: 0; margin: 0 0 8px; background: transparent; }
+  .khoi details.thong-ke { border-top: 1px solid var(--vien); border-radius: 0; padding-top: 10px; }
 
   /* --- Pomodoro --- */
   .pomo {
     background: var(--the); border: 1px solid var(--vien);
-    border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 10px;
   }
   .pomo summary { font-weight: 600; cursor: pointer; }
+  .pomo[open] > summary { margin-bottom: 12px; }
   .pomo-che-do { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 6px; }
   .pomo-gio {
     font-size: 56px; font-weight: 700; text-align: center;
@@ -41,7 +52,8 @@
   }
   .pomo-trang-thai { text-align: center; font-size: 14px; color: var(--chu-nhat); }
   .pomo-nut { justify-content: center; margin: 12px 0 16px; flex-wrap: wrap; }
-  .pomo-cai-dat { border-top: 1px solid var(--vien); padding-top: 14px; }
+  .pomo-cai-dat { border-top: 1px solid var(--vien); padding-top: 12px; }
+  .pomo-cai-dat[open] > summary { margin-bottom: 12px; }
   .pomo-dong { margin-bottom: 12px; }
   .pomo-dong .nhan { display: block; font-size: 13px; color: var(--chu-nhat); margin-bottom: 6px; }
   .pomo input[type=number] {
@@ -71,11 +83,11 @@
   .pomo-mini-gio { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
   .pomo-mini-che-do { font-size: 12px; color: var(--chu-nhat); }
   .pomo-mini .phu { padding: 8px 12px; }
-    .pomo select {
+  .pomo select {
     padding: 6px 8px; font-size: 15px; max-width: 100%;
     border: 1px solid var(--vien); border-radius: 8px; background: var(--the); color: var(--chu);
   }
-    /* --- Thống kê tuần --- */
+  /* --- Thống kê tuần --- */
   .thong-ke {
     background: var(--the); border: 1px solid var(--vien);
     border-radius: 10px; padding: 16px; margin-bottom: 24px;
@@ -95,11 +107,11 @@
   .tk-o.nghi { background: transparent; border: 1px dashed var(--vien); }
   .tk-o.tuonglai { opacity: .6; }
   .nut-thang:disabled { opacity: .35; cursor: default; }
-    /* --- Sao lưu dữ liệu --- */
-  .sao-luu { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--vien); }
+  /* --- Sao lưu dữ liệu --- */
+  .sao-luu { margin-top: 0; padding-top: 0; border-top: 0; margin-bottom: 12px; }
   .sao-luu .nhan { font-size: 13px; color: var(--chu-nhat); margin-bottom: 8px; }
   .sao-luu .chuoi { margin-top: 8px; }
-    /* --- Thống kê tháng --- */
+  /* --- Thống kê tháng --- */
   .thong-ke summary { cursor: pointer; margin-bottom: 12px; }
   .tk-cot-hang { display: flex; gap: 8px; margin: 4px 0 16px; }
   .tk-cot { flex: 1; text-align: center; }
@@ -112,7 +124,7 @@
   .tk-thanh { height: 8px; background: var(--vien); border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
   .tk-thanh div { height: 100%; background: var(--xanh); }
   /* --- Tab kế hoạch --- */
-  .tab-hang { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tab-hang { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
   .tab {
     padding: 8px 14px; border-radius: 20px; font-size: 14px;
     border: 1px solid var(--vien); background: var(--the); color: var(--chu);
@@ -141,7 +153,7 @@
   .thong-tin-kh {
     display: flex; justify-content: space-between; align-items: center; gap: 12px;
     background: var(--the); border: 1px solid var(--vien);
-    border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px;
+    border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; font-size: 14px;
   }
   .thong-tin-kh .dong { color: var(--chu-nhat); }
   .thong-tin-kh strong { color: var(--chu); }
@@ -150,7 +162,7 @@
 
   .tien-do { background: var(--vien); border-radius: 8px; height: 10px; overflow: hidden; margin-bottom: 6px; }
   .tien-do div { height: 100%; background: var(--xanh); width: 0; transition: width .3s; }
-  .tien-do-chu { font-size: 14px; color: var(--chu-nhat); margin-bottom: 24px; }
+  .tien-do-chu { font-size: 14px; color: var(--chu-nhat); margin-bottom: 10px; }
   form { display: flex; gap: 8px; margin-bottom: 10px; }
   input[type=text] {
     flex: 1; padding: 12px 14px; font-size: 16px;
@@ -162,7 +174,7 @@
   }
 
   /* --- Chọn ngày trong tuần --- */
-  .chon-thu { margin-bottom: 24px; }
+  .chon-thu { margin-bottom: 12px; }
   .chon-thu .nhan { font-size: 13px; color: var(--chu-nhat); margin-bottom: 6px; }
   .chip-hang { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .chip {
@@ -188,7 +200,7 @@
   .luoi { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .thu { text-align: center; font-size: 12px; color: var(--chu-nhat); padding: 4px 0; }
   .ngay-o {
-    aspect-ratio: 1; border: 2px solid transparent; border-radius: 8px;
+    aspect-ratio: 1.4; border: 2px solid transparent; border-radius: 8px;
     background: var(--nen); font-size: 14px; color: var(--chu);
   }
   .ngay-o:disabled { opacity: .35; cursor: default; }
@@ -198,15 +210,15 @@
   .chu-thich { font-size: 12px; color: var(--chu-nhat); margin-top: 10px; }
 
   /* --- Danh sách --- */
-  .dang-xem { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 600; }
+  .dang-xem { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 600; }
   .ve-nay {
     border: 1px solid var(--xanh); background: var(--the); color: var(--xanh);
     border-radius: 8px; padding: 6px 12px; font-size: 14px;
   }
   .thoi-quen {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
     background: var(--the); border: 1px solid var(--vien);
-    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 8px;
   }
   .thoi-quen.nghi-hom .hang-tren { opacity: .5; }
   .hang-tren { display: flex; align-items: center; gap: 14px; width: 100%; }
@@ -226,6 +238,7 @@
   .o.nghi { background: transparent; border: 1px dashed var(--vien); }
   .xoa { border: 0; background: none; color: var(--chu-nhat); font-size: 20px; padding: 4px 8px; }
   .xoa:hover { color: var(--do); }
+  .sua-kh { border: 0; background: none; color: var(--chu-nhat); font-size: 16px; padding: 4px 8px; }
   .thoi-quen .chip-hang { width: 100%; padding-left: 48px; }
   /* --- Thói quen theo thời gian / số lần --- */
   .muc-tieu { width: 100%; padding-left: 48px; }
@@ -238,7 +251,7 @@
     border: 1px solid var(--vien); border-radius: 8px; background: var(--the); color: var(--chu);
   }
   .chon-thu input[type=number] { width: 76px; }
-  .trong { text-align: center; color: var(--chu-nhat); padding: 40px 0; }
+  .trong { text-align: center; color: var(--chu-nhat); padding: 24px 0; }
 </style>
 </head>
 <body>
@@ -246,9 +259,9 @@
   <h1>Мои привычки</h1>
   <p class="ngay" id="ngay"></p>
 
-  <!-- POMODORO -->
-  <details class="pomo" open>
-    <summary>Đồng hồ Pomodoro</summary>
+  <!-- POMODORO (gập mặc định, tiêu đề hiện giờ đang chạy) -->
+  <details class="pomo">
+    <summary>Đồng hồ Pomodoro · <span id="p-sum">25:00</span></summary>
 
     <div class="pomo-che-do">
       <button class="chip bat" id="p-che-focus" type="button">Tập trung</button>
@@ -266,12 +279,13 @@
       <button class="them" id="p-bat-dau" type="button">Bắt đầu</button>
       <button class="phu" id="p-dat-lai" type="button">Đặt lại</button>
       <button class="phu" id="p-bo-qua" type="button">Bỏ qua</button>
-            <button class="phu" id="p-toan-man" type="button">⛶ Toàn màn hình</button>
+      <button class="phu" id="p-toan-man" type="button">⛶ Toàn màn hình</button>
       <button class="phu" id="p-thu-nho" type="button">Thu nhỏ</button>
-            <button class="phu" id="p-noi" type="button">Cửa sổ nổi</button>
+      <button class="phu" id="p-noi" type="button">Cửa sổ nổi</button>
     </div>
 
-    <div class="pomo-cai-dat">
+    <details class="pomo-cai-dat">
+      <summary>Cài đặt</summary>
       <div class="pomo-dong">
         <span class="nhan">Thời gian tập trung (phút)</span>
         <div class="chip-hang">
@@ -299,7 +313,7 @@
           <input type="number" id="p-nhap-sophien" min="1" max="10" aria-label="Số phiên trước khi nghỉ dài">
         </div>
       </div>
-            <div class="pomo-dong">
+      <div class="pomo-dong">
         <span class="nhan">Mỗi phiên tập trung xong, tự cộng phút vào thói quen:</span>
         <select id="p-noi-thoi-quen"></select>
         <div class="chuoi" id="p-noi-tien-do"></div>
@@ -307,7 +321,7 @@
       <label class="pomo-tu-dong">
         <input type="checkbox" id="p-tudong"> Tự động chạy phiên tiếp theo
       </label>
-    </div>
+    </details>
   </details>
 
   <!-- TAB KẾ HOẠCH -->
@@ -334,62 +348,78 @@
   <div class="tien-do"><div id="thanh"></div></div>
   <div class="tien-do-chu" id="tien-do-chu"></div>
 
-  <form id="form">
-    <input type="text" id="o-nhap" placeholder="Thêm thói quen vào kế hoạch này" maxlength="80" required>
-    <button class="them" type="submit">Thêm</button>
-  </form>
+  <!-- THÊM THÓI QUEN (gập mặc định) -->
+  <details class="khoi">
+    <summary>+ Thêm thói quen</summary>
+    <form id="form">
+      <input type="text" id="o-nhap" placeholder="Thêm thói quen vào kế hoạch này" maxlength="80" required>
+      <button class="them" type="submit">Thêm</button>
+    </form>
 
-  <!-- CHỌN NGÀY LÀM CHO THÓI QUEN MỚI -->
-  <div class="chon-thu">
-    <div class="nhan">Ngày làm trong tuần:</div>
-    <div class="chip-hang" id="chon-thu"></div>
-  </div>
-    <!-- LOẠI THÓI QUEN MỚI -->
-  <div class="chon-thu">
-    <div class="nhan">Loại thói quen:</div>
-    <div class="chip-hang">
-      <select id="loai-moi">
-        <option value="tick">Đánh dấu xong</option>
-        <option value="thoigian">Theo thời gian (phút)</option>
-        <option value="solan">Theo số lần</option>
-      </select>
-      <span id="muc-tieu-hop" hidden>
-        Mục tiêu mỗi ngày:
-        <input type="number" id="muc-tieu-moi" min="1" max="1000" value="40">
-        <span id="don-vi-moi">phút</span>
-      </span>
+    <div class="chon-thu">
+      <div class="nhan">Ngày làm trong tuần:</div>
+      <div class="chip-hang" id="chon-thu"></div>
     </div>
-  </div>
-  <!-- LỊCH -->
-  <div class="lich" id="lich"></div>
-  <div class="thong-ke" id="thong-ke"></div>
-    <details class="thong-ke" open>
-    <summary><strong>Thống kê tháng</strong></summary>
-    <div id="thong-ke-thang"></div>
+
+    <div class="chon-thu">
+      <div class="nhan">Loại thói quen:</div>
+      <div class="chip-hang">
+        <select id="loai-moi">
+          <option value="tick">Đánh dấu xong</option>
+          <option value="thoigian">Theo thời gian (phút)</option>
+          <option value="solan">Theo số lần</option>
+        </select>
+        <span id="muc-tieu-hop" hidden>
+          Mục tiêu mỗi ngày:
+          <input type="number" id="muc-tieu-moi" min="1" max="1000" value="40">
+          <span id="don-vi-moi">phút</span>
+        </span>
+      </div>
+    </div>
   </details>
-  <!-- DANH SÁCH -->
+
+  <!-- DANH SÁCH THÓI QUEN -->
   <div class="dang-xem" id="dang-xem"></div>
   <div id="danh-sach"></div>
-    <!-- ĐỒNG BỘ GOOGLE -->
-  <div class="sao-luu">
-    <div class="nhan">Đồng bộ giữa các thiết bị</div>
-    <div class="hang-nut">
-      <button class="phu" id="dong-bo-dang-nhap" type="button" hidden>Đăng nhập bằng Google</button>
-      <button class="phu" id="dong-bo-dang-xuat" type="button" hidden>Đăng xuất</button>
+
+  <!-- LỊCH (gập mặc định) -->
+  <details class="khoi">
+    <summary>📅 Lịch</summary>
+    <div class="lich" id="lich"></div>
+  </details>
+
+  <!-- THỐNG KÊ (gập mặc định) -->
+  <details class="khoi">
+    <summary>📊 Thống kê</summary>
+    <div class="thong-ke" id="thong-ke"></div>
+    <details class="thong-ke">
+      <summary><strong>Thống kê tháng</strong></summary>
+      <div id="thong-ke-thang"></div>
+    </details>
+  </details>
+
+  <!-- ĐỒNG BỘ & SAO LƯU (gập mặc định) -->
+  <details class="khoi">
+    <summary>⚙ Đồng bộ &amp; sao lưu</summary>
+    <div class="sao-luu">
+      <div class="nhan">Đồng bộ giữa các thiết bị</div>
+      <div class="hang-nut">
+        <button class="phu" id="dong-bo-dang-nhap" type="button" hidden>Đăng nhập bằng Google</button>
+        <button class="phu" id="dong-bo-dang-xuat" type="button" hidden>Đăng xuất</button>
+      </div>
+      <div class="chuoi" id="dong-bo-tai-khoan"></div>
+      <div class="chuoi" id="dong-bo-trang-thai"></div>
     </div>
-    <div class="chuoi" id="dong-bo-tai-khoan"></div>
-    <div class="chuoi" id="dong-bo-trang-thai"></div>
-  </div>
-  <!-- SAO LƯU DỮ LIỆU -->
-  <div class="sao-luu">
-    <div class="nhan">Sao lưu dữ liệu</div>
-    <div class="hang-nut">
-      <button class="phu" id="xuat-du-lieu" type="button">⬇ Xuất ra file</button>
-      <button class="phu" id="nhap-du-lieu" type="button">⬆ Nhập từ file</button>
-      <input type="file" id="chon-file" accept=".json,application/json" hidden>
+    <div class="sao-luu">
+      <div class="nhan">Sao lưu dữ liệu</div>
+      <div class="hang-nut">
+        <button class="phu" id="xuat-du-lieu" type="button">⬇ Xuất ra file</button>
+        <button class="phu" id="nhap-du-lieu" type="button">⬆ Nhập từ file</button>
+        <input type="file" id="chon-file" accept=".json,application/json" hidden>
+      </div>
+      <div class="chuoi">Nên xuất định kỳ (ví dụ mỗi tuần) và cất file ở nơi an toàn như USB hoặc Google Drive.</div>
     </div>
-    <div class="chuoi">Nên xuất định kỳ (ví dụ mỗi tuần) và cất file ở nơi an toàn như USB hoặc Google Drive.</div>
-  </div>
+  </details>
 </main>
 
 <!-- POMODORO TOÀN MÀN HÌNH -->
@@ -412,7 +442,7 @@
     <div class="pomo-mini-che-do" id="pm-che-do"></div>
   </div>
   <button class="phu" id="pm-bat-dau" type="button">▶</button>
-    <button class="phu" id="pm-noi" type="button" title="Cửa sổ nổi trên mọi tab">Nổi</button>
+  <button class="phu" id="pm-noi" type="button" title="Cửa sổ nổi trên mọi tab">Nổi</button>
   <button class="phu" id="pm-mo-rong" type="button" aria-label="Phóng to">⤢</button>
 </div>
 <script>
@@ -426,12 +456,13 @@
   const CHU_THU = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
   const TAT_CA = [0, 1, 2, 3, 4, 5, 6];
   let thuMoi = TAT_CA.slice();   // ngày được chọn cho thói quen sắp thêm
+  const moRong = new Set();      // các thói quen đang mở phần sửa ngày làm
 
   function kh() {
     return keHoach.find(k => k.id === idDangChon);
   }
 
-   function luu() {
+  function luu() {
     localStorage.setItem("keHoachV2", JSON.stringify(keHoach));
     localStorage.setItem("keHoachDangChon", String(idDangChon));
     sauKhiLuu();                       // báo cho phần đồng bộ biết có thay đổi
@@ -448,7 +479,7 @@
     }
 
     // CHUYỂN ĐỔI: thói quen cũ chưa có "thu" thì mặc định làm mọi ngày
-        data.forEach(k => k.thoiQuen.forEach(t => {
+    data.forEach(k => k.thoiQuen.forEach(t => {
       if (!Array.isArray(t.thu) || t.thu.length === 0) t.thu = TAT_CA.slice();
       if (!t.loai) t.loai = "tick";                 // thói quen cũ: loại đánh dấu
       if (!(t.mucTieu >= 1)) t.mucTieu = 1;
@@ -539,7 +570,7 @@
   const TEN_THANG = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
 
   // ===== 5. HÀNH ĐỘNG =====
-    function them(ten) {
+  function them(ten) {
     const loai = document.getElementById("loai-moi").value;
     let muc = Math.round(Number(document.getElementById("muc-tieu-moi").value));
     if (!(muc >= 1)) muc = loai === "thoigian" ? 40 : 2;
@@ -574,7 +605,7 @@
     }
     luu(); ve();
   }
-    // Cộng/trừ tiến độ (phút hoặc số lần) của ngày đang chọn
+  // Cộng/trừ tiến độ (phút hoặc số lần) của ngày đang chọn
   function doiTienDo(id, soLuong) {
     const tq = kh().thoiQuen.find(x => x.id === id);
     if (!tq.tienDo) tq.tienDo = {};
@@ -808,7 +839,7 @@
     const ds = document.getElementById("danh-sach");
     ds.innerHTML = "";
     if (k.thoiQuen.length === 0) {
-      ds.innerHTML = '<div class="trong">Kế hoạch này chưa có thói quen nào. Hãy thêm ở ô phía trên.</div>';
+      ds.innerHTML = '<div class="trong">Kế hoạch này chưa có thói quen nào. Hãy thêm ở mục "+ Thêm thói quen".</div>';
     }
 
     const coLichTruoc = k.thoiQuen.filter(t => coLich(t, ngayChon))
@@ -836,7 +867,7 @@
       div.className = "thoi-quen" + (lamHomNay ? "" : " nghi-hom");
       div.innerHTML = `
         <div class="hang-tren">
-                    <button class="tick ${xong ? "xong" : ""}" ${lamHomNay && tq.loai === "tick" ? "" : "disabled"} aria-label="Đánh dấu">${xong ? "✓" : ""}</button>
+          <button class="tick ${xong ? "xong" : ""}" ${lamHomNay && tq.loai === "tick" ? "" : "disabled"} aria-label="Đánh dấu">${xong ? "✓" : ""}</button>
           <div class="thong-tin">
             <div class="ten"></div>
             <div class="chuoi">${dongPhu}</div>
@@ -887,7 +918,16 @@
         box.querySelector(".sua-mt").onclick = () => doiMucTieu(tq.id);
         div.querySelector(".hang-tren").after(box);
       }
+
+      // --- Hàng chọn ngày làm: ẩn mặc định, bấm ⚙ để mở ---
       const chips = div.querySelector(".chip-hang");
+      chips.hidden = !moRong.has(tq.id);
+      const nutSua = document.createElement("button");
+      nutSua.type = "button"; nutSua.className = "sua-kh"; nutSua.textContent = "⚙";
+      nutSua.setAttribute("aria-label", "Sửa ngày làm trong tuần");
+      nutSua.onclick = () => { moRong.has(tq.id) ? moRong.delete(tq.id) : moRong.add(tq.id); ve(); };
+      div.querySelector(".xoa").before(nutSua);
+
       CHU_THU.forEach((ten, idx) => {
         const nut = document.createElement("button");
         nut.className = "chip" + (tq.thu.includes(idx) ? " bat" : "");
@@ -911,8 +951,8 @@
         : "Нет привычек на этот день";
     }
     document.getElementById("tien-do-chu").textContent = chuTienDo;
-        vePomoNoi();
-            veThongKe();
+    vePomoNoi();
+    veThongKe();
 
     veLich();
   }
@@ -934,7 +974,7 @@
   if (!(pomo.soPhien >= 1)) pomo.soPhien = 3;
   if (typeof pomo.dem !== "object" || pomo.dem === null) pomo.dem = {};
 
-   function luuPomo() {
+  function luuPomo() {
     localStorage.setItem(POMO_KEY, JSON.stringify(pomo));
     sauKhiLuu();                       // báo cho phần đồng bộ biết có thay đổi
   }
@@ -979,10 +1019,11 @@
   function vePomoGio() {
     const gio = pDinhDang(pConLai);
     document.getElementById("p-gio").textContent = gio;
+    document.getElementById("p-sum").textContent = gio + (pChay ? " ▶" : "");   // giờ hiện cả khi khung Pomodoro đang gập
     const tyLe = 1 - pConLai / pTong();
     document.getElementById("p-thanh").style.width = Math.min(100, Math.max(0, tyLe * 100)) + "%";
     document.title = pChay ? `${gio} · ${TEN_CHE_DO[pCheDo]}` : "Мои привычки";
-        veManHinhPhu();
+    veManHinhPhu();
   }
 
   // Vẽ các nút, trạng thái, bộ đếm
@@ -1078,9 +1119,8 @@
     if (pCheDo === "focus") {
       pomo.dem[homNay()] = (pomo.dem[homNay()] || 0) + 1;
       luuPomo();
-            congPhutChoThoiQuen(pomo.focus);     
-             // cộng số phút của phiên vừa xong vào thói quen đã nối
-                   veThongKe();
+      congPhutChoThoiQuen(pomo.focus);     // cộng số phút của phiên vừa xong vào thói quen đã nối
+      veThongKe();
       pChuKy++;
       pCheDo = pChuKy >= pomo.soPhien ? "dai" : "nghi";
     } else {
@@ -1160,7 +1200,7 @@
     document.getElementById("pt-chu-ky").textContent = `Chu kỳ: ${pChuKy}/${pomo.soPhien} phiên`;
 
     // Khung nhỏ ở góc
-        pmMini.querySelector("#pm-gio").textContent = gio;
+    pmMini.querySelector("#pm-gio").textContent = gio;
     pmMini.querySelector("#pm-che-do").textContent = che;
     pmMini.querySelector("#pm-bat-dau").textContent = pChay ? "⏸" : "▶";
   }
@@ -1183,14 +1223,14 @@
     } catch (e) {}
   }
 
-    function thuNho() {
+  function thuNho() {
     pThuNho = true;
     document.querySelector(".pomo").hidden = true;    // ẩn khung Pomodoro lớn
     pmMini.hidden = false;                            // hiện khung nhỏ
     veManHinhPhu();
   }
 
-   function phongTo() {
+  function phongTo() {
     pThuNho = false;
     if (pipWin) pipWin.close();                       // đang ở cửa sổ nổi thì đóng nó lại
     document.querySelector(".pomo").hidden = false;
@@ -1212,7 +1252,7 @@
   document.addEventListener("keydown", e => {
     if (e.key === "Escape" && pToanManHinh) dongToanManHinh();
   });
-    // ===== 10C. POMODORO: CỬA SỔ NỔI (hiện trên mọi tab) =====
+  // ===== 10C. POMODORO: CỬA SỔ NỔI (hiện trên mọi tab) =====
   const pmMini = document.getElementById("pomo-mini");   // khung nhỏ, giữ tham chiếu vì nó sẽ đổi chỗ
   let pipWin = null;                                     // cửa sổ nổi (null = chưa mở)
 
@@ -1257,7 +1297,7 @@
 
   document.getElementById("p-noi").onclick = chuyenCuaSoNoi;
   document.getElementById("pm-noi").onclick = chuyenCuaSoNoi;
-    // ===== 10D. POMODORO NỐI VỚI THÓI QUEN THEO THỜI GIAN =====
+  // ===== 10D. POMODORO NỐI VỚI THÓI QUEN THEO THỜI GIAN =====
 
   // Tìm thói quen đang được nối (tìm trong mọi kế hoạch). Không có thì trả về null
   function timThoiQuenNoi() {
@@ -1308,7 +1348,7 @@
     luuPomo();
     vePomoNoi();
   };
-    // ===== 10E. THỐNG KÊ THEO TUẦN =====
+  // ===== 10E. THỐNG KÊ THEO TUẦN =====
   let tuanDau = null;   // ngày Thứ 2 của tuần đang xem (null = tuần này)
 
   // Ngày Thứ 2 của tuần chứa ngày s
@@ -1412,9 +1452,9 @@
 
     khung.querySelector("#tuan-truoc").onclick = () => { tuanDau = congNgay(tuanDau, -7); veThongKe(); };
     khung.querySelector("#tuan-sau").onclick = () => { tuanDau = congNgay(tuanDau, 7); veThongKe(); };
-        veThongKeThang();
+    veThongKeThang();
   }
-    // ===== 10F. XUẤT / NHẬP DỮ LIỆU =====
+  // ===== 10F. XUẤT / NHẬP DỮ LIỆU =====
 
   // Chuỗi có đúng dạng ngày "YYYY-MM-DD" không?
   const laNgay = s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
@@ -1530,7 +1570,7 @@
     nhapDuLieu(e.target.files[0]);
     e.target.value = "";          // cho phép chọn lại đúng file đó lần sau
   };
-    // ===== 10G. THỐNG KÊ THEO THÁNG =====
+  // ===== 10G. THỐNG KÊ THEO THÁNG =====
   let thangTK = null;   // ngày mùng 1 của tháng đang xem (null = tháng này)
 
   // 125 -> "2 giờ 5 phút", 40 -> "40 phút"
@@ -1666,7 +1706,7 @@
     khung.querySelector("#thang-tk-truoc").onclick = () => { thangTK = new Date(y, m - 1, 1); veThongKeThang(); };
     khung.querySelector("#thang-tk-sau").onclick = () => { thangTK = new Date(y, m + 1, 1); veThongKeThang(); };
   }
-    // ===== 10H. ĐỒNG BỘ BẰNG TÀI KHOẢN GOOGLE (Firebase) =====
+  // ===== 10H. ĐỒNG BỘ BẰNG TÀI KHOẢN GOOGLE (Firebase) =====
 
   // DÁN cấu hình Firebase của bạn vào đây (lấy ở bước A2). Thay cả khối { ... } này.
   const FIREBASE_CONFIG = {
@@ -1908,7 +1948,7 @@
   });
   document.getElementById("kh-luu").onclick = taoKeHoach;
   document.getElementById("kh-huy").onclick = dongForm;
-  
+
   // Đổi loại thói quen mới: ẩn/hiện ô mục tiêu và đổi đơn vị
   function capNhatLoaiMoi() {
     const loai = document.getElementById("loai-moi").value;
@@ -1921,7 +1961,7 @@
   doc();
   ve();
   khoiDongPomo();
-    khoiDongDongBo();
+  khoiDongDongBo();
 </script>
 </body>
 </html>
