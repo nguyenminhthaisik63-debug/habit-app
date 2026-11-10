@@ -1957,7 +1957,15 @@
     document.getElementById("muc-tieu-moi").value = loai === "thoigian" ? 40 : 2;   // số gợi ý
   }
   document.getElementById("loai-moi").onchange = capNhatLoaiMoi;
+// Đăng ký Service Worker để dùng offline
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(console.error);
+  }
 
+  doc();
+  ve();
+  khoiDongPomo();
+  khoiDongDongBo();
   doc();
   ve();
   khoiDongPomo();
