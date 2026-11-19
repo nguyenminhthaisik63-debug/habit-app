@@ -1,35 +1,39 @@
-const CACHE = "thoi-quen-v1";   // đổi v2, v3... khi bạn sửa index.html
+const CACHE_NAME = 'habit-app-pwa-v1';
+const ASSETS = [
+  '/habit-app/',
+  '/habit-app/index.html',
+  '/habit-app/manifest.json'
+];
 
-self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "./index.html"])));
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
   self.skipWaiting();
 });
 
-self.addEventListener("activate", e => {
-  e.waitUntil(
-    caches.keys()
-      .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
   );
+  self.clients.claim();
 });
 
-self.addEventListener("fetch", e => {
-  const req = e.request;
-  if (req.method !== "GET") return;
-  const url = new URL(req.url);
-  // Chỉ xử lý file của app và các module Firebase (gstatic)
-  if (url.origin !== location.origin && url.hostname !== "www.gstatic.com") return;
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
 
-  e.respondWith(
-    caches.match(req).then(cu => {
-      const moi = fetch(req).then(res => {
-        if (res.ok) {
-          const b = res.clone();
-          caches.open(CACHE).then(c => c.put(req, b));
-        }
-        return res;
-      }).catch(() => cu || (req.mode === "navigate" ? caches.match("./index.html") : undefined));
-      return cu || moi;
-    })
-  );
+  if (url.origin === location.origin) {
+    event.respondWith(
+      fetch(event.request)
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          return res;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  }
 });
